@@ -7,14 +7,10 @@ export default function SettingsScreen() {
     const [twoStepEnabled, setTwoStepEnabled] = useState(true);
 
     const menuItems = [
-        { title: 'Add Account', onPress: () => {} },
         { title: 'Change Password', onPress: () => {} },
-        { title: 'Change Language', onPress: () => {} },
-        { title: 'Upgrade Plan', onPress: () => {} },
-        { title: 'Multiple Account', onPress: () => {} },
-        { title: 'Personnes bloquées', onPress: () => {} },
-        { title: "Nom d'utilisateur", onPress: () => {} },
-        { title: 'Photo de profil', onPress: () => {} },
+        { title: 'Change Language', onPress: () => router.push('/screens/ChooseLanguageScreen') },
+        { title: 'User details', onPress: () => router.push('/screens/ChooseLanguageScreen') },
+        { title: 'Profile Picture', onPress: () => {} },
     ];
 
     return (
