@@ -65,7 +65,7 @@ export default function HomeScreen() {
                             <TouchableOpacity style={styles.actionButton}>
                                 <Text style={styles.actionIcon}>+</Text>
                             </TouchableOpacity>
-                            <TouchableOpacity style={styles.actionButton}>
+                            <TouchableOpacity style={styles.actionButton} onPress={() => router.push('/screens/UtilisateursListScreen')}>
                                 <Text style={styles.actionIcon}>☰</Text>
                             </TouchableOpacity>
                             <TouchableOpacity style={styles.actionButton}>
@@ -130,14 +130,15 @@ export default function HomeScreen() {
                 <TouchableOpacity style={styles.navItem} onPress={() => router.push('/screens/DocumentScanScreen')}>
                     <Text style={styles.navIcon}>📄</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.navItem}>
+                <TouchableOpacity style={styles.navItem} onPress={() => router.push('/screens/ChatListScreen')}>
                     <Text style={styles.navIcon}>💬</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.navItem}>
+
+                <TouchableOpacity style={styles.navItem}  onPress={() => router.push('/screens/UtilisateursListScreen')}>
                     <Text style={styles.navIcon}>👤</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.navItem}>
-                    <Text style={styles.navIcon}>💬</Text>
+                <TouchableOpacity style={styles.navItem} onPress={() => router.push('/screens/SettingsScreen')}>
+                    <Text style={styles.navIcon}>🔧</Text>
                 </TouchableOpacity>
             </View>
         </SafeAreaView>

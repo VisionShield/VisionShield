@@ -26,7 +26,13 @@ export default function ChatListScreen() {
     const renderChat = ({ item }) => (
         <TouchableOpacity
             style={styles.chatItem}
-            onPress={() => router.push(`/screens/ChatScreen?chatId=${item.id}`)}
+            onPress={() =>
+  router.push({
+    pathname: '/screens/FaceRecognitionScreen',
+    params: { target: '/screens/ChatScreen', chatId: item.id },
+  })
+}
+
         >
             <View style={styles.avatar}>
                 <Text style={{ fontSize: 24 }}>{item.avatar}</Text>
