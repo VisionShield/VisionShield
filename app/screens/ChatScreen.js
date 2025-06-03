@@ -3,17 +3,25 @@ import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet, SafeArea
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 
-const messages = [
-    { id: '1', text: 'Hey, did you review the contract?', sent: false, time: '10:30 AM' },
-    { id: '2', text: 'Yes, I have some comments', sent: true, time: '10:31 AM' },
-];
-
 export default function ChatScreen() {
+    const [messages, setMessages] = useState([
+        { id: '1', text: 'Hey, did you review the contract?', sent: false, time: '10:30 AM' },
+        { id: '2', text: 'Yes, I have some comments', sent: true, time: '10:31 AM' },
+    ]);
     const [newMessage, setNewMessage] = useState('');
 
     const sendMessage = () => {
         if (newMessage.trim()) {
-            // Add message logic
+            const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+            const newMsg = {
+                id: Date.now().toString(),
+                text: newMessage,
+                sent: true,
+                time: time,
+            };
+
+            setMessages(prev => [newMsg, ...prev]); // ajoute au début
             setNewMessage('');
         }
     };
@@ -38,7 +46,7 @@ export default function ChatScreen() {
                 </TouchableOpacity>
             </View>
 
-            {/* Messages List */}
+            {/* Messages */}
             <FlatList
                 data={messages}
                 keyExtractor={item => item.id}
@@ -47,7 +55,7 @@ export default function ChatScreen() {
                 inverted
             />
 
-            {/* Message Input */}
+            {/* Input */}
             <View style={styles.inputContainer}>
                 <TextInput
                     style={styles.input}
@@ -65,10 +73,7 @@ export default function ChatScreen() {
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#fff',
-    },
+    container: { flex: 1, backgroundColor: '#fff' },
     header: {
         flexDirection: 'row',
         justifyContent: 'space-between',
@@ -77,13 +82,8 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1,
         borderBottomColor: '#eee',
     },
-    chatName: {
-        fontSize: 18,
-        fontWeight: '600',
-    },
-    messagesContainer: {
-        padding: 16,
-    },
+    chatName: { fontSize: 18, fontWeight: '600' },
+    messagesContainer: { padding: 16 },
     messageBubble: {
         maxWidth: '80%',
         padding: 12,
@@ -100,19 +100,8 @@ const styles = StyleSheet.create({
         alignSelf: 'flex-start',
         borderBottomLeftRadius: 4,
     },
-    messageText: {
-        fontSize: 16,
-        color: '#333',
-    },
-    sentMessageText: {
-        color: 'white',
-    },
-    messageTime: {
-        fontSize: 12,
-        color: '#666',
-        marginTop: 4,
-        alignSelf: 'flex-end',
-    },
+    messageText: { fontSize: 16, color: '#333' },
+    messageTime: { fontSize: 12, color: '#666', marginTop: 4, alignSelf: 'flex-end' },
     inputContainer: {
         flexDirection: 'row',
         alignItems: 'center',
