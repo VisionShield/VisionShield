@@ -61,8 +61,8 @@ export default function ChatScreen() {
                 <TouchableOpacity onPress={() => router.back()}>
                     <Ionicons name="arrow-back" size={24} color="#333" />
                 </TouchableOpacity>
-                <Text style={styles.chatName}>{userNames[uid] || 'Utilisateur'}</Text>
-                <TouchableOpacity>
+                <Text style={styles.chatName}>{userNames[uid] || 'User'}</Text>
+                <TouchableOpacity onPress={() => router.push('/screens/UserDetailsScreen')}>
                     <Ionicons name="information-circle" size={24} color="#333" />
                 </TouchableOpacity>
             </View>
