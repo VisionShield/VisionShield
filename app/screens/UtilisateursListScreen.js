@@ -7,7 +7,7 @@ import Utilisateurs from '../constants/Utilisateurs';
 
 export default function UtilisateursListScreen() {
   const handlePress = (userId) => {
-    router.push(`/screens/ChatScreen?chatId=${userId}`);
+    router.push({ pathname: '/screens/ChatScreen', params: { userId } });
   };
 
   const renderItem = ({ item }) => (
@@ -24,7 +24,7 @@ export default function UtilisateursListScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>Mes Utilisateurs</Text>
+        <Text style={styles.title}>My Users</Text>
       </View>
       <FlatList
         data={Utilisateurs}

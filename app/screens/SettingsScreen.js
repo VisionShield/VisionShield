@@ -7,10 +7,10 @@ export default function SettingsScreen() {
     const [twoStepEnabled, setTwoStepEnabled] = useState(true);
 
     const menuItems = [
-        { title: 'Change Password', onPress: () => {} },
+        { title: 'Change Password', onPress: () => router.push('/screens/ChangePasswordScreen') },
         { title: 'Change Language', onPress: () => router.push('/screens/ChooseLanguageScreen') },
-        { title: 'User details', onPress: () => router.push('/screens/ChooseLanguageScreen') },
-        { title: 'Profile Picture', onPress: () => {} },
+        { title: 'User details', onPress: () => router.push('/screens/UserDetailsScreen') },
+        { title: 'Profile Picture', onPress: () => router.push('/screens/ProfilePictureScreen') },
     ];
 
     return (

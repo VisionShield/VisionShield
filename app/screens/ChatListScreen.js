@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, SafeAreaView, TextInput } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 
@@ -23,16 +23,32 @@ const chats = [
 ];
 
 export default function ChatListScreen() {
+    const [search, setSearch] = useState('');
+    const [filteredChats, setFilteredChats] = useState(chats);
+
+    const handleSearch = (text) => {
+        setSearch(text);
+        if (text.trim() === '') {
+            setFilteredChats(chats);
+        } else {
+            setFilteredChats(
+                chats.filter(c =>
+                    c.name.toLowerCase().includes(text.toLowerCase()) ||
+                    c.lastMessage.toLowerCase().includes(text.toLowerCase())
+                )
+            );
+        }
+    };
+
     const renderChat = ({ item }) => (
         <TouchableOpacity
             style={styles.chatItem}
             onPress={() =>
-  router.push({
-    pathname: '/screens/FaceRecognitionScreen',
-    params: { target: '/screens/ChatScreen', chatId: item.id },
-  })
-}
-
+                router.push({
+                    pathname: '/screens/FaceRecognitionScreen',
+                    params: { target: '/screens/ChatScreen', userId: item.id },
+                })
+            }
         >
             <View style={styles.avatar}>
                 <Text style={{ fontSize: 24 }}>{item.avatar}</Text>
@@ -61,13 +77,26 @@ export default function ChatListScreen() {
         <SafeAreaView style={styles.container}>
             <View style={styles.header}>
                 <Text style={styles.headerTitle}>Messages</Text>
-                <TouchableOpacity>
-                    <Ionicons name="search" size={24} color="#333" />
-                </TouchableOpacity>
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <TextInput
+                        style={{
+                            backgroundColor: '#f0f0f0',
+                            borderRadius: 20,
+                            paddingHorizontal: 12,
+                            height: 36,
+                            width: 160,
+                            // marginRight: 8, // plus besoin de marge
+                        }}
+                        placeholder="🔍 Rechercher"
+                        value={search}
+                        onChangeText={handleSearch}
+                        placeholderTextColor="#999"
+                    />
+                </View>
             </View>
 
             <FlatList
-                data={chats}
+                data={filteredChats}
                 keyExtractor={item => item.id}
                 renderItem={renderChat}
                 contentContainerStyle={styles.listContent}

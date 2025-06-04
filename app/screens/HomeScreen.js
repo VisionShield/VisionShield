@@ -1,13 +1,14 @@
-import React from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet, SafeAreaView, TextInput } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, SafeAreaView, TextInput, Alert } from 'react-native';
 import { router } from 'expo-router';
+import Utilisateurs from '../constants/Utilisateurs';
 
 export default function HomeScreen() {
-    const users = [
+    const [users, setUsers] = useState([
         {
             id: 1,
             name: 'Olivia Turner, M.D.',
-            role: 'Manager of LinkQ Project',
+            role: 'LinkQ Project Manager',
             status: 'Great access',
             avatar: '👩‍⚕️',
             type: 'Manager'
@@ -15,17 +16,63 @@ export default function HomeScreen() {
         {
             id: 2,
             name: 'Dr. Alexander Bennett, Ph.D.',
-            role: 'Lawyer in charge',
+            role: 'Lead Lawyer',
             status: 'Great access',
             avatar: '👨‍💼',
             type: 'Lawyer'
         }
-    ];
+    ]);
 
     const files = [
         { id: 1, name: 'SGM Contract', date: 'November 22 2020', icon: '📄' },
         { id: 2, name: 'JIP Contract', date: 'November 22 2020', icon: '📄' }
     ];
+
+    const [search, setSearch] = useState('');
+    const [filteredUsers, setFilteredUsers] = useState(users);
+
+    // Ajout utilisateur
+    const [showAddUser, setShowAddUser] = useState(false);
+    const [newUserName, setNewUserName] = useState('');
+    const [newUserRole, setNewUserRole] = useState('');
+
+    const handleAddUser = () => {
+        if (newUserName.trim() && newUserRole.trim()) {
+            const newUser = {
+                id: Date.now(),
+                name: newUserName,
+                role: newUserRole,
+                status: 'New access',
+                avatar: '👤',
+                type: 'User'
+            };
+            const updatedUsers = [newUser, ...users];
+            setUsers(updatedUsers);
+            setFilteredUsers(updatedUsers);
+            setShowAddUser(false);
+            setNewUserName('');
+            setNewUserRole('');
+        }
+    };
+
+    const handleSearch = (text) => {
+        setSearch(text);
+        if (text.trim() === '') {
+            setFilteredUsers(users);
+        } else {
+            setFilteredUsers(
+                users.filter(u =>
+                    u.name.toLowerCase().includes(text.toLowerCase()) ||
+                    u.role.toLowerCase().includes(text.toLowerCase())
+                )
+            );
+        }
+    };
+
+    const handleUserPress = (user) => {
+        // Naviguer vers la conversation de l'utilisateur
+        router.push({ pathname: '/screens/ChatScreen', params: { userId: user.id } });
+    };
 
     return (
         <SafeAreaView style={styles.container}>
@@ -34,7 +81,25 @@ export default function HomeScreen() {
                     <Text style={styles.menuIcon}>☰</Text>
                 </TouchableOpacity>
                 <Text style={styles.homeTitle}>Home</Text>
-                <TouchableOpacity>
+                <TouchableOpacity
+                    onPress={() =>
+                        Alert.alert(
+                            'Choose a list',
+                            'Where do you want to go?',
+                            [
+                                {
+                                    text: 'Users',
+                                    onPress: () => router.push('/screens/UtilisateursListScreen'),
+                                },
+                                {
+                                    text: 'Shared documents',
+                                    onPress: () => router.push('/screens/DocShareScreen'),
+                                },
+                                { text: 'Cancel', style: 'cancel' },
+                            ]
+                        )
+                    }
+                >
                     <Text style={styles.moreIcon}>⋯</Text>
                 </TouchableOpacity>
             </View>
@@ -44,7 +109,7 @@ export default function HomeScreen() {
                     <Text style={styles.profileAvatar}>👨‍💼</Text>
                     <View style={styles.profileInfo}>
                         <Text style={styles.profileName}>Neelesh Chaudhary</Text>
-                        <Text style={styles.profileRole}>UI / UX Designer</Text>
+                        <Text style={styles.profileRole}>Designer</Text>
                     </View>
                 </View>
             </View>
@@ -53,29 +118,68 @@ export default function HomeScreen() {
                 <View style={styles.searchContainer}>
                     <TextInput
                         style={styles.searchInput}
-                        placeholder="🔍 Recherche d'utilisateurs"
+                        placeholder="🔍 Search users"
                         placeholderTextColor="#999"
+                        value={search}
+                        onChangeText={handleSearch}
+                        returnKeyType="search"
                     />
                 </View>
 
                 <View style={styles.section}>
                     <View style={styles.sectionHeader}>
-                        <Text style={styles.sectionTitle}>Mes utilisateurs :</Text>
+                        <Text style={styles.sectionTitle}>My users:</Text>
                         <View style={styles.sectionActions}>
-                            <TouchableOpacity style={styles.actionButton}>
+                            <TouchableOpacity
+                                style={styles.actionButton}
+                                onPress={() => setShowAddUser(true)}
+                            >
                                 <Text style={styles.actionIcon}>+</Text>
                             </TouchableOpacity>
                             <TouchableOpacity style={styles.actionButton} onPress={() => router.push('/screens/UtilisateursListScreen')}>
                                 <Text style={styles.actionIcon}>☰</Text>
                             </TouchableOpacity>
-                            <TouchableOpacity style={styles.actionButton}>
-                                <Text style={styles.actionIcon}>></Text>
-                            </TouchableOpacity>
                         </View>
                     </View>
 
-                    {users.map((user) => (
-                        <TouchableOpacity key={user.id} style={styles.userCard}>
+                    {/* Add user form */}
+                    {showAddUser && (
+                        <View style={{ backgroundColor: '#f0f4fa', padding: 16, borderRadius: 8, marginBottom: 16 }}>
+                            <TextInput
+                                style={[styles.searchInput, { marginBottom: 8 }]}
+                                placeholder="User name"
+                                value={newUserName}
+                                onChangeText={setNewUserName}
+                            />
+                            <TextInput
+                                style={styles.searchInput}
+                                placeholder="Role"
+                                value={newUserRole}
+                                onChangeText={setNewUserRole}
+                            />
+                            <View style={{ flexDirection: 'row', marginTop: 8 }}>
+                                <TouchableOpacity
+                                    style={[styles.actionButton, { marginRight: 16 }]}
+                                    onPress={handleAddUser}
+                                >
+                                    <Text style={styles.actionIcon}>Add</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity
+                                    style={styles.actionButton}
+                                    onPress={() => setShowAddUser(false)}
+                                >
+                                    <Text style={styles.actionIcon}>Cancel</Text>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                    )}
+
+                    {filteredUsers.map((user) => (
+                        <TouchableOpacity
+                            key={user.id}
+                            style={styles.userCard}
+                            onPress={() => handleUserPress(user)}
+                        >
                             <Text style={styles.userAvatar}>{user.avatar}</Text>
                             <View style={styles.userInfo}>
                                 <Text style={styles.userName}>{user.name}</Text>
@@ -91,25 +195,31 @@ export default function HomeScreen() {
                         </TouchableOpacity>
                     ))}
                 </View>
-
                 <View style={styles.section}>
                     <View style={styles.sectionHeader}>
-                        <Text style={styles.sectionTitle}>Mes fichiers partagés récemment :</Text>
+                        <Text style={styles.sectionTitle}>Recently shared files:</Text>
                         <View style={styles.sectionActions}>
-                            <TouchableOpacity style={styles.actionButton}>
+                            <TouchableOpacity
+                                style={styles.actionButton}
+                                onPress={() => router.push('/screens/DocumentScanScreen')}
+                            >
                                 <Text style={styles.actionIcon}>+</Text>
                             </TouchableOpacity>
-                            <TouchableOpacity style={styles.actionButton}>
+                            <TouchableOpacity
+                                style={styles.actionButton}
+                                onPress={() => router.push('/screens/DocShareScreen')}
+                            >
                                 <Text style={styles.actionIcon}>☰</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity style={styles.actionButton}>
-                                <Text style={styles.actionIcon}>></Text>
                             </TouchableOpacity>
                         </View>
                     </View>
 
                     {files.map((file) => (
-                        <TouchableOpacity key={file.id} style={styles.fileCard}>
+                        <TouchableOpacity
+                            key={file.id}
+                            style={styles.fileCard}
+                            onPress={() => router.push({ pathname: '/screens/FileFolderScreen', params: { fileId: file.id } })}
+                        >
                             <Text style={styles.fileIcon}>{file.icon}</Text>
                             <View style={styles.fileInfo}>
                                 <Text style={styles.fileName}>{file.name}</Text>

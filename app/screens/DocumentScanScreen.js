@@ -15,14 +15,14 @@ export default function DocumentScanScreen() {
 
   const handleScan = () => {
     if (Platform.OS === 'web') {
-      Alert.alert('Info', 'La numérisation fonctionne uniquement sur mobile');
+      Alert.alert('Info', 'Scanning only works on mobile');
       return;
     }
 
     setIsScanning(true);
     setTimeout(() => {
       setIsScanning(false);
-      Alert.alert('Succès', 'Document numérisé avec succès !');
+      Alert.alert('Success', 'Document scanned successfully!');
     }, 2000);
   };
 
@@ -32,10 +32,10 @@ export default function DocumentScanScreen() {
         <TouchableOpacity onPress={() => router.push('/screens/HomeScreen')}>
           <Text style={styles.backButton}>←</Text>
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Numérisation des documents</Text>
+        <Text style={styles.headerTitle}>Document scanning</Text>
       </View>
 
-      <Text style={styles.instruction}>Placez le document dans le cadre</Text>
+      <Text style={styles.instruction}>Place the document in the frame</Text>
 
       <View style={styles.cameraContainer}>
         <View style={styles.documentFrame}>

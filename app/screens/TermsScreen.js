@@ -6,7 +6,7 @@ export default function TermsScreen() {
     return (
         <SafeAreaView style={styles.container}>
             <View style={styles.header}>
-                <Text style={styles.headerTitle}>Terms of Services</Text>
+                <Text style={styles.headerTitle}>Terms of Service</Text>
                 <TouchableOpacity onPress={() => router.back()}>
                     <Text style={styles.doneButton}>Done</Text>
                 </TouchableOpacity>

@@ -1,28 +1,49 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet, SafeAreaView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 
-export default function ChatScreen() {
-    const [messages, setMessages] = useState([
+// Simuler une base de données de messages par utilisateur (en mémoire)
+const initialConversations = {
+    1: [
         { id: '1', text: 'Hey, did you review the contract?', sent: false, time: '10:30 AM' },
         { id: '2', text: 'Yes, I have some comments', sent: true, time: '10:31 AM' },
-    ]);
+    ],
+    2: [
+        { id: '1', text: 'Bonjour, avez-vous reçu les documents ?', sent: false, time: '09:00 AM' },
+        { id: '2', text: 'Oui, tout est ok.', sent: true, time: '09:01 AM' },
+    ],
+};
+
+const userNames = {
+    1: 'Olivia Turner',
+    2: 'Dr. Alexander Bennett',
+};
+
+export default function ChatScreen() {
+    const { userId } = useLocalSearchParams();
+    const uid = userId ? userId.toString() : '1';
+
+    const [messages, setMessages] = useState(initialConversations[uid] || []);
     const [newMessage, setNewMessage] = useState('');
+
+    useEffect(() => {
+        setMessages(initialConversations[uid] || []);
+    }, [uid]);
 
     const sendMessage = () => {
         if (newMessage.trim()) {
             const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
             const newMsg = {
                 id: Date.now().toString(),
                 text: newMessage,
                 sent: true,
                 time: time,
             };
-
-            setMessages(prev => [newMsg, ...prev]); // ajoute au début
+            setMessages(prev => [newMsg, ...prev]);
             setNewMessage('');
+            // Optionnel : mettre à jour la "base" locale
+            initialConversations[uid] = [newMsg, ...(initialConversations[uid] || [])];
         }
     };
 
@@ -40,7 +61,7 @@ export default function ChatScreen() {
                 <TouchableOpacity onPress={() => router.back()}>
                     <Ionicons name="arrow-back" size={24} color="#333" />
                 </TouchableOpacity>
-                <Text style={styles.chatName}>Olivia Turner</Text>
+                <Text style={styles.chatName}>{userNames[uid] || 'Utilisateur'}</Text>
                 <TouchableOpacity>
                     <Ionicons name="information-circle" size={24} color="#333" />
                 </TouchableOpacity>
