@@ -24,21 +24,10 @@ const chats = [
 
 export default function ChatListScreen() {
     const [search, setSearch] = useState('');
-    const [filteredChats, setFilteredChats] = useState(chats);
-
-    const handleSearch = (text) => {
-        setSearch(text);
-        if (text.trim() === '') {
-            setFilteredChats(chats);
-        } else {
-            setFilteredChats(
-                chats.filter(c =>
-                    c.name.toLowerCase().includes(text.toLowerCase()) ||
-                    c.lastMessage.toLowerCase().includes(text.toLowerCase())
-                )
-            );
-        }
-    };
+    const filteredChats = chats.filter(chat =>
+        chat.name.toLowerCase().includes(search.toLowerCase()) ||
+        chat.lastMessage.toLowerCase().includes(search.toLowerCase())
+    );
 
     const renderChat = ({ item }) => (
         <TouchableOpacity
@@ -85,11 +74,10 @@ export default function ChatListScreen() {
                             paddingHorizontal: 12,
                             height: 36,
                             width: 160,
-                            // marginRight: 8, // plus besoin de marge
                         }}
-                        placeholder="🔍 Rechercher"
+                        placeholder="🔍 Search"
                         value={search}
-                        onChangeText={handleSearch}
+                        onChangeText={setSearch}
                         placeholderTextColor="#999"
                     />
                 </View>
