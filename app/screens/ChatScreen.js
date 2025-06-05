@@ -1,17 +1,24 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet, SafeAreaView } from 'react-native';
+import {View, Text,
+    TextInput,
+    TouchableOpacity,
+    FlatList,
+    StyleSheet,
+    SafeAreaView,
+    KeyboardAvoidingView,
+    Platform,
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
 
-// Simuler une base de données de messages par utilisateur (en mémoire)
 const initialConversations = {
     1: [
-        { id: '1', text: 'Hey, did you review the contract?', sent: false, time: '10:30 AM' },
-        { id: '2', text: 'Yes, I have some comments', sent: true, time: '10:31 AM' },
+    { id: '1', text: 'Hey, did you review the contract?', sent: false, time: '10:30 AM' },
+    { id: '2', text: 'Yes, I have some comments', sent: true, time: '10:31 AM' },
     ],
     2: [
-        { id: '1', text: 'Bonjour, avez-vous reçu les documents ?', sent: false, time: '09:00 AM' },
-        { id: '2', text: 'Oui, tout est ok.', sent: true, time: '09:01 AM' },
+    { id: '1', text: 'Bonjour, avez-vous reçu les documents ?', sent: false, time: '09:00 AM' },
+    { id: '2', text: 'Oui, tout est ok.', sent: true, time: '09:01 AM' },
     ],
 };
 
@@ -33,62 +40,68 @@ export default function ChatScreen() {
 
     const sendMessage = () => {
         if (newMessage.trim()) {
-            const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            const newMsg = {
-                id: Date.now().toString(),
-                text: newMessage,
-                sent: true,
-                time: time,
-            };
-            setMessages(prev => [newMsg, ...prev]);
-            setNewMessage('');
-            // Optionnel : mettre à jour la "base" locale
-            initialConversations[uid] = [newMsg, ...(initialConversations[uid] || [])];
-        }
+        const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const newMsg = {
+        id: Date.now().toString(),
+        text: newMessage,
+        sent: true,
+        time: time,
+        };
+        setMessages(prev => [newMsg, ...prev]);
+        setNewMessage('');
+        initialConversations[uid] = [newMsg, ...(initialConversations[uid] || [])];
+    }
     };
 
     const renderMessage = ({ item }) => (
         <View style={[styles.messageBubble, item.sent ? styles.sentMessage : styles.receivedMessage]}>
-            <Text style={styles.messageText}>{item.text}</Text>
-            <Text style={styles.messageTime}>{item.time}</Text>
-        </View>
+        <Text style={styles.messageText}>{item.text}</Text>
+        <Text style={styles.messageTime}>{item.time}</Text>
+    </View>
     );
 
     return (
-        <SafeAreaView style={styles.container}>
-            {/* Header */}
-            <View style={styles.header}>
-                <TouchableOpacity onPress={() => router.back()}>
-                    <Ionicons name="arrow-back" size={24} color="#333" />
-                </TouchableOpacity>
-                <Text style={styles.chatName}>{userNames[uid] || 'User'}</Text>
-                <TouchableOpacity onPress={() => router.push('/screens/UserDetailsScreen')}>
-                    <Ionicons name="information-circle" size={24} color="#333" />
-                </TouchableOpacity>
-            </View>
+    <SafeAreaView style={styles.container}>
+        <KeyboardAvoidingView
+            style={{ flex: 1 }}
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            keyboardVerticalOffset={90} // Ajuste en fonction de la hauteur de ton header
+        >
+        {/* Header */}
+        <View style={styles.header}>
+            <TouchableOpacity onPress={() => router.back()}>
+                <Ionicons name="arrow-back" size={24} color="#333" />
+            </TouchableOpacity>
+            <Text style={styles.chatName}>{userNames[uid] || 'User'}</Text>
+            <TouchableOpacity onPress={() => router.push('/screens/UserDetailsScreen')}>
+                <Ionicons name="information-circle" size={24} color="#333" />
+            </TouchableOpacity>
+        </View>
 
-            {/* Messages */}
-            <FlatList
-                data={messages}
-                keyExtractor={item => item.id}
-                renderItem={renderMessage}
-                contentContainerStyle={styles.messagesContainer}
-                inverted
+        {/* Messages */}
+        <FlatList
+            data={messages}
+            keyExtractor={item => item.id}
+            renderItem={renderMessage}
+            contentContainerStyle={styles.messagesContainer}
+            inverted
+            keyboardShouldPersistTaps="handled"
+        />
+
+        {/* Input */}
+        <View style={styles.inputContainer}>
+            <TextInput
+                style={styles.input}
+                placeholder="Type a message..."
+                value={newMessage}
+                onChangeText={setNewMessage}
+                multiline
             />
-
-            {/* Input */}
-            <View style={styles.inputContainer}>
-                <TextInput
-                    style={styles.input}
-                    placeholder="Type a message..."
-                    value={newMessage}
-                    onChangeText={setNewMessage}
-                    multiline
-                />
-                <TouchableOpacity style={styles.sendButton} onPress={sendMessage}>
-                    <Ionicons name="send" size={24} color="white" />
-                </TouchableOpacity>
+            <TouchableOpacity style={styles.sendButton} onPress={sendMessage}>
+                <Ionicons name="send" size={24} color="white" />
+            </TouchableOpacity>
             </View>
+        </KeyboardAvoidingView>
         </SafeAreaView>
     );
 }
@@ -109,7 +122,7 @@ const styles = StyleSheet.create({
         maxWidth: '80%',
         padding: 12,
         borderRadius: 16,
-        marginVertical: 8,
+    marginVertical: 8,
     },
     sentMessage: {
         backgroundColor: '#2196F3',
@@ -129,6 +142,7 @@ const styles = StyleSheet.create({
         padding: 16,
         borderTopWidth: 1,
         borderTopColor: '#eee',
+        backgroundColor: '#fff',
     },
     input: {
         flex: 1,
@@ -141,10 +155,10 @@ const styles = StyleSheet.create({
     },
     sendButton: {
         backgroundColor: '#2196F3',
-        width: 48,
-        height: 48,
-        borderRadius: 24,
-        alignItems: 'center',
-        justifyContent: 'center',
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
     },
 });
