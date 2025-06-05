@@ -1,5 +1,15 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView, ScrollView } from 'react-native';
+import {
+    View,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    StyleSheet,
+    SafeAreaView,
+    ScrollView,
+    KeyboardAvoidingView,
+    Platform
+} from 'react-native';
 import { router } from 'expo-router';
 
 export default function SignupScreen() {
@@ -21,98 +31,106 @@ export default function SignupScreen() {
 
     return (
         <SafeAreaView style={styles.container}>
+            <KeyboardAvoidingView
+            style={{ flex: 1 }}
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        >
+            <ScrollView
+            style={styles.content}
+            contentContainerStyle={{ paddingBottom: 40 }}
+            keyboardShouldPersistTaps="handled"
+        >
             <View style={styles.header}>
                 <TouchableOpacity onPress={() => router.back()}>
-                    <Text style={styles.backButton}>← Back</Text>
+                <Text style={styles.backButton}>← Back</Text>
                 </TouchableOpacity>
                 <Text style={styles.headerTitle}>New Account</Text>
             </View>
 
-            <ScrollView style={styles.content}>
-                <View style={styles.socialButtons}>
-                    <TouchableOpacity style={styles.appleButton}>
-                        <Text style={styles.appleButtonText}>🍎 Sign in with Apple</Text>
-                    </TouchableOpacity>
+            <View style={styles.socialButtons}>
+                <TouchableOpacity style={styles.appleButton}>
+                <Text style={styles.appleButtonText}>🍎 Sign in with Apple</Text>
+                </TouchableOpacity>
 
-                    <TouchableOpacity style={styles.googleButton}>
-                        <Text style={styles.googleButtonText}>📧 Sign up with Google</Text>
-                    </TouchableOpacity>
+                <TouchableOpacity style={styles.googleButton}>
+                <Text style={styles.googleButtonText}>📧 Sign up with Google</Text>
+                </TouchableOpacity>
+            </View>
+
+            <Text style={styles.sectionTitle}>Account Information</Text>
+
+            <View style={styles.formContainer}>
+                <View style={styles.inputGroup}>
+                <Text style={styles.inputLabel}>First Name</Text>
+                <TextInput
+                    style={styles.input}
+                    value={firstName}
+                    onChangeText={setFirstName}
+                    placeholder="First Name"
+                />
                 </View>
 
-                <Text style={styles.sectionTitle}>Account Information</Text>
+                <View style={styles.inputGroup}>
+                <Text style={styles.inputLabel}>Last Name</Text>
+                <TextInput
+                    style={styles.input}
+                    value={lastName}
+                    onChangeText={setLastName}
+                    placeholder="Last Name"
+                />
+            </View>
 
-                <View style={styles.formContainer}>
-                    <View style={styles.inputGroup}>
-                        <Text style={styles.inputLabel}>First Name</Text>
-                        <TextInput
-                            style={styles.input}
-                            value={firstName}
-                            onChangeText={setFirstName}
-                            placeholder="First Name"
-                        />
-                    </View>
+            <View style={styles.inputGroup}>
+                <Text style={styles.inputLabel}>Email</Text>
+                <TextInput
+                    style={styles.input}
+                    value={email}
+                    onChangeText={setEmail}
+                    placeholder="Email"
+                    keyboardType="email-address"
+                    autoCapitalize="none"
+                />
+            </View>
 
-                    <View style={styles.inputGroup}>
-                        <Text style={styles.inputLabel}>Last Name</Text>
-                        <TextInput
-                            style={styles.input}
-                            value={lastName}
-                            onChangeText={setLastName}
-                            placeholder="Last Name"
-                        />
-                    </View>
-
-                    <View style={styles.inputGroup}>
-                        <Text style={styles.inputLabel}>Email</Text>
-                        <TextInput
-                            style={styles.input}
-                            value={email}
-                            onChangeText={setEmail}
-                            placeholder="Email"
-                            keyboardType="email-address"
-                            autoCapitalize="none"
-                        />
-                    </View>
-
-                    <View style={styles.inputGroup}>
-                        <Text style={styles.inputLabel}>Password</Text>
-                        <TextInput
-                            style={styles.input}
-                            value={password}
-                            onChangeText={setPassword}
-                            placeholder="Password"
-                            secureTextEntry
-                        />
-                        <View style={styles.passwordStrengthContainer}>
-                            <View style={[styles.strengthBar, { backgroundColor: '#E0E0E0' }]}>
-                                <View style={[
-                                    styles.strengthProgress,
-                                    {
-                                        backgroundColor: getPasswordStrengthColor(),
-                                        width: '80%'
-                                    }
-                                ]} />
-                            </View>
-                            <Text style={[styles.strengthText, { color: getPasswordStrengthColor() }]}>
-                                {passwordStrength}
-                            </Text>
-                        </View>
-                    </View>
-
-                    <TouchableOpacity style={styles.createButton} onPress={handleCreateAccount}>
-                        <Text style={styles.createButtonText}>Create Account</Text>
-                    </TouchableOpacity>
+            <View style={styles.inputGroup}>
+                <Text style={styles.inputLabel}>Password</Text>
+                <TextInput
+                    style={styles.input}
+                    value={password}
+                    onChangeText={setPassword}
+                    placeholder="Password"
+                    secureTextEntry
+                />
+                <View style={styles.passwordStrengthContainer}>
+                    <View style={[styles.strengthBar, { backgroundColor: '#E0E0E0' }]}>
+                    <View
+                        style={[
+                        styles.strengthProgress,
+                        {
+                            backgroundColor: getPasswordStrengthColor(),
+                            width: '80%',
+                        },
+                        ]}
+                    />
                 </View>
-            </ScrollView>
-        </SafeAreaView>
+                <Text style={[styles.strengthText, { color: getPasswordStrengthColor() }]}>
+                    {passwordStrength}
+                </Text>
+                </View>
+            </View>
+
+            <TouchableOpacity style={styles.createButton} onPress={handleCreateAccount}>
+                <Text style={styles.createButtonText}>Create Account</Text>
+            </TouchableOpacity>
+            </View>
+        </ScrollView>
+        </KeyboardAvoidingView>
+    </SafeAreaView>
     );
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#fff',
-    },
+    container: { flex: 1, backgroundColor: '#fff' },
     header: {
         flexDirection: 'row',
         alignItems: 'center',
