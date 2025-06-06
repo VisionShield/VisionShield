@@ -8,7 +8,8 @@ import {
     SafeAreaView,
     ScrollView,
     KeyboardAvoidingView,
-    Platform
+    Platform,
+    Image
 } from 'react-native';
 import { router } from 'expo-router';
 
@@ -49,11 +50,25 @@ export default function SignupScreen() {
 
             <View style={styles.socialButtons}>
                 <TouchableOpacity style={styles.appleButton}>
-                <Text style={styles.appleButtonText}>🍎 Sign in with Apple</Text>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+                        <Image
+                            source={require('../../assets/apple.png')}
+                            style={{ width: 22, height: 22, marginRight: 8 }}
+                            resizeMode="contain"
+                        />
+                        <Text style={styles.appleButtonText}>Sign in with Apple</Text>
+                    </View>
                 </TouchableOpacity>
 
                 <TouchableOpacity style={styles.googleButton}>
-                <Text style={styles.googleButtonText}>📧 Sign up with Google</Text>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+                        <Image
+                            source={require('../../assets/google.png')}
+                            style={{ width: 22, height: 22, marginRight: 8 }}
+                            resizeMode="contain"
+                        />
+                        <Text style={styles.googleButtonText}>Sign up with Google</Text>
+                    </View>
                 </TouchableOpacity>
             </View>
 

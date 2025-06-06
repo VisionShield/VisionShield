@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet, SafeAreaView, TextInput, Alert } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, SafeAreaView, TextInput, Alert, Image } from 'react-native';
 import { router } from 'expo-router';
 import Utilisateurs from '../constants/Utilisateurs';
 
@@ -10,7 +10,7 @@ export default function HomeScreen() {
             name: 'Olivia Turner, M.D.',
             role: 'LinkQ Project Manager',
             status: 'Great access',
-            avatar: '👩‍⚕️',
+            avatar: require('../../assets/iconef.png'),
             type: 'Manager'
         },
         {
@@ -18,7 +18,7 @@ export default function HomeScreen() {
             name: 'Dr. Alexander Bennett, Ph.D.',
             role: 'Lead Lawyer',
             status: 'Great access',
-            avatar: '👨‍💼',
+            avatar: require('../../assets/iconeh.png'),
             type: 'Lawyer'
         }
     ]);
@@ -106,7 +106,7 @@ export default function HomeScreen() {
 
             <View style={styles.profileSection}>
                 <View style={styles.profileCard}>
-                    <Text style={styles.profileAvatar}>👨‍💼</Text>
+                    <Image source={require('../../assets/iconeh.png')} style={{ width: 40, height: 40, marginRight: 15 }} />
                     <View style={styles.profileInfo}>
                         <Text style={styles.profileName}>Neelesh Chaudhary</Text>
                         <Text style={styles.profileRole}>Designer</Text>
@@ -180,7 +180,7 @@ export default function HomeScreen() {
                             style={styles.userCard}
                             onPress={() => handleUserPress(user)}
                         >
-                            <Text style={styles.userAvatar}>{user.avatar}</Text>
+                            <Image source={user.avatar} style={{ width: 40, height: 40, marginRight: 15 }} />
                             <View style={styles.userInfo}>
                                 <Text style={styles.userName}>{user.name}</Text>
                                 <Text style={styles.userRole}>{user.role}</Text>
@@ -189,9 +189,7 @@ export default function HomeScreen() {
                             <View style={styles.userBadge}>
                                 <Text style={styles.userType}>{user.type}</Text>
                             </View>
-                            <TouchableOpacity>
-                                <Text style={styles.favoriteIcon}>❤️</Text>
-                            </TouchableOpacity>
+                            {/* Removed heart icon */}
                         </TouchableOpacity>
                     ))}
                 </View>
@@ -235,7 +233,7 @@ export default function HomeScreen() {
 
             <View style={styles.bottomNav}>
                 <TouchableOpacity style={styles.navItem}>
-                    <Text style={styles.navIcon}>🏠</Text>
+                    <Image source={require('../../assets/home.png')} style={{ width: 28, height: 28 }} />
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.navItem} onPress={() => router.push('/screens/DocumentScanScreen')}>
                     <Text style={styles.navIcon}>📄</Text>
@@ -395,9 +393,6 @@ const styles = StyleSheet.create({
         fontSize: 10,
         color: '#fff',
         fontWeight: 'bold',
-    },
-    favoriteIcon: {
-        fontSize: 16,
     },
     fileCard: {
         backgroundColor: '#fff',

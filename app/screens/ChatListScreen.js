@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, SafeAreaView, TextInput } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, SafeAreaView, TextInput, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 
@@ -10,7 +10,7 @@ const chats = [
         lastMessage: 'Hey, did you review the contract?',
         time: '10:30 AM',
         unread: 2,
-        avatar: '👩⚕️',
+        avatar: require('../../assets/iconef.png'),
     },
     {
         id: '2',
@@ -18,7 +18,7 @@ const chats = [
         lastMessage: 'Important security update',
         time: '9:45 AM',
         unread: 0,
-        avatar: '👨💼',
+        avatar: require('../../assets/iconeh.png'),
     },
 ];
 
@@ -40,7 +40,7 @@ export default function ChatListScreen() {
             }
         >
             <View style={styles.avatar}>
-                <Text style={{ fontSize: 24 }}>{item.avatar}</Text>
+                <Image source={item.avatar} style={{ width: 32, height: 32 }} />
             </View>
             <View style={styles.chatInfo}>
                 <Text style={styles.chatName}>{item.name}</Text>
@@ -89,6 +89,41 @@ export default function ChatListScreen() {
                 renderItem={renderChat}
                 contentContainerStyle={styles.listContent}
             />
+            <View style={styles.bottomNav}>
+                <TouchableOpacity
+                  style={styles.navItem}
+                  onPress={() => router.push('/screens/HomeScreen')}
+                >
+                  <Image
+                    source={require('../../assets/home.png')}
+                    style={{ width: 28, height: 28 }}
+                  />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.navItem}
+                  onPress={() => router.push('/screens/DocumentScanScreen')}
+                >
+                  <Text style={styles.navIcon}>📄</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.navItem}
+                  onPress={() => {}}
+                >
+                  <Text style={styles.navIcon}>💬</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.navItem}
+                  onPress={() => router.push('/screens/UtilisateursListScreen')}
+                >
+                  <Text style={styles.navIcon}>👤</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.navItem}
+                  onPress={() => router.push('/screens/SettingsScreen')}
+                >
+                  <Text style={styles.navIcon}>🔧</Text>
+                </TouchableOpacity>
+            </View>
         </SafeAreaView>
     );
 }
@@ -165,5 +200,19 @@ const styles = StyleSheet.create({
         color: 'white',
         fontSize: 12,
         fontWeight: '600',
+    },
+    bottomNav: {
+        flexDirection: 'row',
+        backgroundColor: '#fff',
+        paddingVertical: 15,
+        borderTopWidth: 1,
+        borderTopColor: '#eee',
+    },
+    navItem: {
+        flex: 1,
+        alignItems: 'center',
+    },
+    navIcon: {
+        fontSize: 24,
     },
 });

@@ -1,38 +1,59 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView, ScrollView, Image } from 'react-native';
 import { router } from 'expo-router';
 
 export default function AuthScreen() {
     return (
         <SafeAreaView style={styles.container}>
             <ScrollView contentContainerStyle={styles.scrollContent}>
-                <Text style={styles.welcome}>Bienvenue sur</Text>
+                <Text style={styles.welcome}>Welcome to</Text>
                 <View style={styles.logoRow}>
-                    <Text style={styles.logoIcon}>🛡️</Text>
+                    <Image
+                        source={require('../../assets/logo.jpg')}
+                        style={styles.logoImage}
+                        resizeMode="contain"
+                    />
                     <Text style={styles.logo}>Vision Shield</Text>
                 </View>
-                <Text style={styles.subtitle}>Votre lecture. Votre visage. Votre sécurité.</Text>
+                <Text style={styles.subtitle}>Your reading. Your face. Your security.</Text>
 
                 <View style={styles.features}>
                     <View style={styles.featureRow}>
                         <Text style={styles.featureIcon}>🔒</Text>
-                        <Text style={styles.featureText}>Protégez vos documents sensibles</Text>
+                        <Text style={styles.featureText}>Protect your sensitive documents</Text>
                     </View>
                     <View style={styles.featureRow}>
-                        <Text style={styles.featureIcon}>🧑‍💼</Text>
-                        <Text style={styles.featureText}>Accès par reconnaissance faciale</Text>
+                        <Image
+                            source={require('../../assets/icone1.png')}
+                            style={{ width: 24, height: 24, marginRight: 12 }}
+                        />
+                        <Text style={styles.featureText}>Access by facial recognition</Text>
                     </View>
                     <View style={styles.featureRow}>
                         <Text style={styles.featureIcon}>📄</Text>
-                        <Text style={styles.featureText}>Lecture 100% privée et traçable</Text>
+                        <Text style={styles.featureText}>100% private and traceable reading</Text>
                     </View>
                 </View>
 
                 <TouchableOpacity style={styles.appleButton} onPress={() => router.push('/screens/FaceRecognitionScreen')}>
-                    <Text style={styles.appleButtonText}>🍎 Sign in with Apple</Text>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+                        <Image
+                            source={require('../../assets/apple.png')}
+                            style={{ width: 22, height: 22, marginRight: 8 }}
+                            resizeMode="contain"
+                        />
+                        <Text style={styles.appleButtonText}>Sign in with Apple</Text>
+                    </View>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.googleButton} onPress={() => router.push('/screens/SignupScreen')}>
-                    <Text style={styles.googleButtonText}>📧 Sign up with Google</Text>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+                        <Image
+                            source={require('../../assets/google.png')}
+                            style={{ width: 22, height: 22, marginRight: 8 }}
+                            resizeMode="contain"
+                        />
+                        <Text style={styles.googleButtonText}>Sign up with Google</Text>
+                    </View>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.signupButton} onPress={() => router.push('/screens/SignupScreen')}>
                     <Text style={styles.signupButtonText}>Sign up</Text>
@@ -50,7 +71,7 @@ const styles = StyleSheet.create({
     scrollContent: { padding: 24, alignItems: 'center', justifyContent: 'center' },
     welcome: { fontSize: 16, color: '#666', marginBottom: 8 },
     logoRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 10 },
-    logoIcon: { fontSize: 32, marginRight: 8 },
+    logoImage: { width: 40, height: 40, marginRight: 8 },
     logo: { fontSize: 28, fontWeight: 'bold', color: '#3479e3' },
     subtitle: { fontSize: 15, color: '#888', marginBottom: 32, textAlign: 'center' },
     features: { width: '100%', marginBottom: 32 },

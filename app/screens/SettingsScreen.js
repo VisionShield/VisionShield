@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, ScrollView, TouchableOpacity, Switch } from 'react-native';
+import { View, Text, StyleSheet, SafeAreaView, ScrollView, TouchableOpacity, Switch, Image } from 'react-native';
 import { router } from 'expo-router';
 
 export default function SettingsScreen() {
@@ -58,6 +58,41 @@ export default function SettingsScreen() {
                     <Text style={styles.chevron}>›</Text>
                 </TouchableOpacity>
             </ScrollView>
+            <View style={styles.bottomNav}>
+                <TouchableOpacity
+                  style={styles.navItem}
+                  onPress={() => router.push('/screens/HomeScreen')}
+                >
+                  <Image
+                    source={require('../../assets/home.png')}
+                    style={{ width: 28, height: 28 }}
+                  />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.navItem}
+                  onPress={() => router.push('/screens/DocumentScanScreen')}
+                >
+                  <Text style={styles.navIcon}>📄</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.navItem}
+                  onPress={() => router.push('/screens/ChatListScreen')}
+                >
+                  <Text style={styles.navIcon}>💬</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.navItem}
+                  onPress={() => router.push('/screens/UtilisateursListScreen')}
+                >
+                  <Text style={styles.navIcon}>👤</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.navItem}
+                  onPress={() => {}}
+                >
+                  <Text style={styles.navIcon}>🔧</Text>
+                </TouchableOpacity>
+            </View>
         </SafeAreaView>
     );
 }
@@ -113,5 +148,19 @@ const styles = StyleSheet.create({
         paddingVertical: 18,
         borderBottomWidth: 1,
         borderBottomColor: '#f8f8f8',
+    },
+    bottomNav: {
+        flexDirection: 'row',
+        backgroundColor: '#fff',
+        paddingVertical: 15,
+        borderTopWidth: 1,
+        borderTopColor: '#eee',
+    },
+    navItem: {
+        flex: 1,
+        alignItems: 'center',
+    },
+    navIcon: {
+        fontSize: 24,
     },
 });

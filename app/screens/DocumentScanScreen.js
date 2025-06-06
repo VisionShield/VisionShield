@@ -7,6 +7,7 @@ import {
   SafeAreaView,
   Platform,
   Alert,
+  Image,
 } from 'react-native';
 import { router } from 'expo-router';
 
@@ -56,6 +57,42 @@ export default function DocumentScanScreen() {
       <TouchableOpacity style={styles.captureButton} onPress={handleScan}>
         <View style={styles.captureButtonInner} />
       </TouchableOpacity>
+
+      <View style={styles.bottomNav}>
+        <TouchableOpacity
+          style={styles.navItem}
+          onPress={() => router.push('/screens/HomeScreen')}
+        >
+          <Image
+            source={require('../../assets/home.png')}
+            style={{ width: 28, height: 28 }}
+          />
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.navItem}
+          onPress={() => {}}
+        >
+          <Text style={styles.navIcon}>📄</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.navItem}
+          onPress={() => router.push('/screens/ChatListScreen')}
+        >
+          <Text style={styles.navIcon}>💬</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.navItem}
+          onPress={() => router.push('/screens/UtilisateursListScreen')}
+        >
+          <Text style={styles.navIcon}>👤</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.navItem}
+          onPress={() => router.push('/screens/SettingsScreen')}
+        >
+          <Text style={styles.navIcon}>🔧</Text>
+        </TouchableOpacity>
+      </View>
     </SafeAreaView>
   );
 }
@@ -149,5 +186,19 @@ const styles = StyleSheet.create({
     height: 60,
     backgroundColor: '#4A90E2',
     borderRadius: 30,
+  },
+  bottomNav: {
+    flexDirection: 'row',
+    backgroundColor: '#fff',
+    paddingVertical: 15,
+    borderTopWidth: 1,
+    borderTopColor: '#eee',
+  },
+  navItem: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  navIcon: {
+    fontSize: 24,
   },
 });
