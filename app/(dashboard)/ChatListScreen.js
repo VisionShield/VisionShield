@@ -34,7 +34,7 @@ export default function ChatListScreen() {
             style={styles.chatItem}
             onPress={() =>
                 router.push({
-                    pathname: '/screens/FaceRecognitionScreen',
+                    pathname: '/(chat)/ChatScreen',
                     params: { target: '/screens/ChatScreen', userId: item.id },
                 })
             }
@@ -89,41 +89,7 @@ export default function ChatListScreen() {
                 renderItem={renderChat}
                 contentContainerStyle={styles.listContent}
             />
-            <View style={styles.bottomNav}>
-                <TouchableOpacity
-                  style={styles.navItem}
-                  onPress={() => router.push('/screens/HomeScreen')}
-                >
-                  <Image
-                    source={require('../../assets/home.png')}
-                    style={{ width: 28, height: 28 }}
-                  />
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.navItem}
-                  onPress={() => router.push('/screens/DocumentScanScreen')}
-                >
-                  <Text style={styles.navIcon}>📄</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.navItem}
-                  onPress={() => {}}
-                >
-                  <Text style={styles.navIcon}>💬</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.navItem}
-                  onPress={() => router.push('/screens/UtilisateursListScreen')}
-                >
-                  <Text style={styles.navIcon}>👤</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.navItem}
-                  onPress={() => router.push('/screens/SettingsScreen')}
-                >
-                  <Text style={styles.navIcon}>🔧</Text>
-                </TouchableOpacity>
-            </View>
+            
         </SafeAreaView>
     );
 }

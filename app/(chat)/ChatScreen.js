@@ -61,47 +61,43 @@ export default function ChatScreen() {
     );
 
     return (
-    <SafeAreaView style={styles.container}>
-        <KeyboardAvoidingView
-            style={{ flex: 1 }}
-            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-            keyboardVerticalOffset={90} // Ajuste en fonction de la hauteur de ton header
-        >
-        {/* Header */}
-        <View style={styles.header}>
-            <TouchableOpacity onPress={() => router.back()}>
-                <Ionicons name="arrow-back" size={24} color="#333" />
-            </TouchableOpacity>
-            <Text style={styles.chatName}>{userNames[uid] || 'User'}</Text>
-            <TouchableOpacity onPress={() => router.push('/screens/UserDetailsScreen')}>
-                <Ionicons name="information-circle" size={24} color="#333" />
-            </TouchableOpacity>
-        </View>
-
-        {/* Messages */}
-        <FlatList
-            data={messages}
-            keyExtractor={item => item.id}
-            renderItem={renderMessage}
-            contentContainerStyle={styles.messagesContainer}
-            inverted
-            keyboardShouldPersistTaps="handled"
-        />
-
-        {/* Input */}
-        <View style={styles.inputContainer}>
-            <TextInput
-                style={styles.input}
-                placeholder="Type a message..."
-                value={newMessage}
-                onChangeText={setNewMessage}
-                multiline
-            />
-            <TouchableOpacity style={styles.sendButton} onPress={sendMessage}>
-                <Ionicons name="send" size={24} color="white" />
-            </TouchableOpacity>
+        <SafeAreaView style={styles.container}>
+            <View style={styles.header}>
+                <TouchableOpacity onPress={() => router.back()}>
+                    <Ionicons name="arrow-back" size={24} color="#333" />
+                </TouchableOpacity>
+                <Text style={styles.chatName}>{userNames[uid] || 'User'}</Text>
+                <TouchableOpacity onPress={() => router.push('/screens/UserDetailsScreen')}>
+                    <Ionicons name="information-circle" size={24} color="#333" />
+                </TouchableOpacity>
             </View>
-        </KeyboardAvoidingView>
+            <KeyboardAvoidingView
+                style={{ flex: 1 }}
+                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                keyboardVerticalOffset={20} // Réduit l'offset pour moins d'espace
+            >
+                <FlatList
+                    data={messages}
+                    keyExtractor={item => item.id}
+                    renderItem={renderMessage}
+                    contentContainerStyle={[styles.messagesContainer, { paddingBottom: 0 }]
+                    }
+                    inverted
+                    keyboardShouldPersistTaps="handled"
+                />
+                <View style={styles.inputContainer}>
+                    <TextInput
+                        style={styles.input}
+                        placeholder="Type a message..."
+                        value={newMessage}
+                        onChangeText={setNewMessage}
+                        multiline
+                    />
+                    <TouchableOpacity style={styles.sendButton} onPress={sendMessage}>
+                        <Ionicons name="send" size={24} color="white" />
+                    </TouchableOpacity>
+                </View>
+            </KeyboardAvoidingView>
         </SafeAreaView>
     );
 }
@@ -139,7 +135,8 @@ const styles = StyleSheet.create({
     inputContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        padding: 16,
+        padding: 8, // Réduit le padding
+        paddingBottom: 0, // Supprime l'espace en bas
         borderTopWidth: 1,
         borderTopColor: '#eee',
         backgroundColor: '#fff',

@@ -15,3 +15,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff", // ou la couleur de fond globale souhaitée
   },
 });
+
+
+

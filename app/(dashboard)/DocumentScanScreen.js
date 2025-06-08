@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   View,
   Text,
@@ -9,41 +9,72 @@ import {
   Alert,
   Image,
 } from 'react-native';
+import { Camera } from 'expo-camera';
 import { router } from 'expo-router';
 
 export default function DocumentScanScreen() {
   const [isScanning, setIsScanning] = useState(false);
+  const [hasPermission, setHasPermission] = useState(null);
+  const [photoUri, setPhotoUri] = useState(null);
+  const cameraRef = useRef(null);
+  const cameraType = Camera?.Constants?.Type?.back;
 
-  const handleScan = () => {
+  const handleScan = async () => {
     if (Platform.OS === 'web') {
       Alert.alert('Info', 'Scanning only works on mobile');
       return;
     }
+    const { status } = await Camera.requestCameraPermissionsAsync();
+    console.log('Camera permission status:', status);
+    setHasPermission(status === 'granted');
+    if (status === 'granted') {
+      setIsScanning(true);
+    } else {
+      Alert.alert('Permission denied', 'Camera permission is required.');
+    }
+  };
 
-    setIsScanning(true);
-    setTimeout(() => {
+  const takePicture = async () => {
+    if (cameraRef.current) {
+      const photo = await cameraRef.current.takePictureAsync();
+      setPhotoUri(photo.uri);
       setIsScanning(false);
       Alert.alert('Success', 'Document scanned successfully!');
-    }, 2000);
+    }
   };
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.push('/screens/HomeScreen')}>
-          <Text style={styles.backButton}>←</Text>
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Document scanning</Text>
-      </View>
-
       <Text style={styles.instruction}>Place the document in the frame</Text>
 
       <View style={styles.cameraContainer}>
         <View style={styles.documentFrame}>
           <View style={styles.documentPlaceholder}>
-            <Text style={styles.documentIcon}>
-              {isScanning ? '📄 Scanning...' : '📄'}
-            </Text>
+            {isScanning ? (
+              hasPermission === false ? (
+                <Text style={styles.documentIcon}>Permission denied</Text>
+              ) : typeof cameraType !== 'undefined' ? (
+                <Camera
+                  ref={cameraRef}
+                  style={{ flex: 1, width: '100%', borderRadius: 12 }}
+                  type={cameraType}
+                  ratio="4:3"
+                />
+              ) : (
+                <Text style={styles.documentIcon}>Camera not available</Text>
+              )
+            ) : photoUri ? (
+              <Image
+                source={{ uri: photoUri }}
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  borderRadius: 12,
+                }}
+              />
+            ) : (
+              <Text style={styles.documentIcon}>📄</Text>
+            )}
           </View>
           <View style={styles.corners}>
             <View style={[styles.corner, styles.topLeft]} />
@@ -54,59 +85,21 @@ export default function DocumentScanScreen() {
         </View>
       </View>
 
-      <TouchableOpacity style={styles.captureButton} onPress={handleScan}>
-        <View style={styles.captureButtonInner} />
-      </TouchableOpacity>
-
-      <View style={styles.bottomNav}>
-        <TouchableOpacity
-          style={styles.navItem}
-          onPress={() => router.push('/screens/HomeScreen')}
-        >
-          <Image
-            source={require('../../assets/home.png')}
-            style={{ width: 28, height: 28 }}
-          />
+      {isScanning ? (
+        <TouchableOpacity style={styles.captureButton} onPress={takePicture}>
+          <View style={styles.captureButtonInner} />
         </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.navItem}
-          onPress={() => {}}
-        >
-          <Text style={styles.navIcon}>📄</Text>
+      ) : (
+        <TouchableOpacity style={styles.captureButton} onPress={handleScan}>
+          <View style={styles.captureButtonInner} />
         </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.navItem}
-          onPress={() => router.push('/screens/ChatListScreen')}
-        >
-          <Text style={styles.navIcon}>💬</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.navItem}
-          onPress={() => router.push('/screens/UtilisateursListScreen')}
-        >
-          <Text style={styles.navIcon}>👤</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.navItem}
-          onPress={() => router.push('/screens/SettingsScreen')}
-        >
-          <Text style={styles.navIcon}>🔧</Text>
-        </TouchableOpacity>
-      </View>
+      )}
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#222' },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 16,
-    backgroundColor: '#333',
-  },
-  backButton: { fontSize: 24, color: '#fff', marginRight: 16 },
-  headerTitle: { fontSize: 18, color: '#fff', fontWeight: 'bold' },
   instruction: {
     textAlign: 'center',
     color: '#aaa',
@@ -172,6 +165,7 @@ const styles = StyleSheet.create({
   captureButton: {
     alignSelf: 'center',
     marginVertical: 30,
+    marginBottom: 90, // Ajouté pour éloigner le bouton de la navbar
     width: 80,
     height: 80,
     backgroundColor: '#fff',

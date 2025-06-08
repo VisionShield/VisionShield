@@ -16,9 +16,6 @@ export default function SettingsScreen() {
     return (
         <SafeAreaView style={styles.container}>
             <View style={styles.header}>
-                <TouchableOpacity onPress={() => router.back()}>
-                    <Text style={styles.backButton}>←</Text>
-                </TouchableOpacity>
                 <Text style={styles.headerTitle}>Settings</Text>
             </View>
 
@@ -58,41 +55,7 @@ export default function SettingsScreen() {
                     <Text style={styles.chevron}>›</Text>
                 </TouchableOpacity>
             </ScrollView>
-            <View style={styles.bottomNav}>
-                <TouchableOpacity
-                  style={styles.navItem}
-                  onPress={() => router.push('/screens/HomeScreen')}
-                >
-                  <Image
-                    source={require('../../assets/home.png')}
-                    style={{ width: 28, height: 28 }}
-                  />
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.navItem}
-                  onPress={() => router.push('/screens/DocumentScanScreen')}
-                >
-                  <Text style={styles.navIcon}>📄</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.navItem}
-                  onPress={() => router.push('/screens/ChatListScreen')}
-                >
-                  <Text style={styles.navIcon}>💬</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.navItem}
-                  onPress={() => router.push('/screens/UtilisateursListScreen')}
-                >
-                  <Text style={styles.navIcon}>👤</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.navItem}
-                  onPress={() => {}}
-                >
-                  <Text style={styles.navIcon}>🔧</Text>
-                </TouchableOpacity>
-            </View>
+            
         </SafeAreaView>
     );
 }

@@ -9,7 +9,7 @@ export default function Index() {
     // Small delay to ensure navigation context is ready
     const timer = setTimeout(() => {
       setIsReady(true);
-      router.replace('/screens/AuthScreen');
+      router.replace('/(auth)/AuthScreen');
     }, 100);
 
     return () => clearTimeout(timer);

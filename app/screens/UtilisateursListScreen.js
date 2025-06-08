@@ -7,7 +7,7 @@ import Utilisateurs from '../constants/Utilisateurs';
 
 export default function UtilisateursListScreen() {
   const handlePress = (userId) => {
-    router.push({ pathname: '/screens/ChatScreen', params: { userId } });
+    router.push({ pathname: '/(chat)/ChatScreen', params: { userId } });
   };
 
   const renderItem = ({ item }) => (
@@ -36,41 +36,7 @@ export default function UtilisateursListScreen() {
         renderItem={renderItem}
         contentContainerStyle={styles.list}
       />
-      <View style={styles.bottomNav}>
-        <TouchableOpacity
-          style={styles.navItem}
-          onPress={() => router.push('/screens/HomeScreen')}
-        >
-          <Image
-            source={require('../../assets/home.png')}
-            style={{ width: 28, height: 28 }}
-          />
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.navItem}
-          onPress={() => router.push('/screens/DocumentScanScreen')}
-        >
-          <Text style={styles.navIcon}>📄</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.navItem}
-          onPress={() => router.push('/screens/ChatListScreen')}
-        >
-          <Text style={styles.navIcon}>💬</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.navItem}
-          onPress={() => {}}
-        >
-          <Text style={styles.navIcon}>👤</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.navItem}
-          onPress={() => router.push('/screens/SettingsScreen')}
-        >
-          <Text style={styles.navIcon}>🔧</Text>
-        </TouchableOpacity>
-      </View>
+      
     </SafeAreaView>
   );
 }

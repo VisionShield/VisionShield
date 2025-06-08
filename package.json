@@ -40,8 +40,7 @@
     "expo-system-ui": "~5.0.7",
     "expo-web-browser": "~14.1.6",
     "react": "19.0.0",
-    "react-dom": "19.0.0",
-    "react-native": "0.79.2",
+    "react-native": "^0.79.2",
     "react-native-document-scanner-plugin": "^1.0.1",
     "react-native-gesture-handler": "~2.24.0",
     "react-native-gifted-chat": "^2.8.1",
@@ -56,7 +55,7 @@
     "react-native-web": "~0.20.0",
     "react-native-webview": "13.13.5",
     "react-native-worklets-core": "^1.5.0",
-    "react-test-renderer": "^19.1.0"
+    "react-test-renderer": "^19.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

@@ -9,7 +9,7 @@ export default function LoginScreen() {
     const handleLogin = () => {
         if (email === 'test@example.com' && password === 'password123') {
             Alert.alert('Success', 'You are logged in!');
-            router.replace('/screens/HomeScreen');
+            router.replace('/(dashboard)/HomeScreen'); // Redirect to HomeScreen after login
         } else {
             Alert.alert('Error', 'Invalid credentials. Use test@example.com / password123');
         }

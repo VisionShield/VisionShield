@@ -71,7 +71,7 @@ export default function HomeScreen() {
 
     const handleUserPress = (user) => {
         // Naviguer vers la conversation de l'utilisateur
-        router.push({ pathname: '/screens/ChatScreen', params: { userId: user.id } });
+        router.push({ pathname: '/(chat)/ChatScreen', params: { userId: user.id } });
     };
 
     return (
@@ -114,7 +114,7 @@ export default function HomeScreen() {
                 </View>
             </View>
 
-            <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+            <ScrollView style={styles.content} contentContainerStyle={{ flexGrow: 1 }} showsVerticalScrollIndicator={false}>
                 <View style={styles.searchContainer}>
                     <TextInput
                         style={styles.searchInput}
@@ -231,24 +231,7 @@ export default function HomeScreen() {
                 </View>
             </ScrollView>
 
-            <View style={styles.bottomNav}>
-                <TouchableOpacity style={styles.navItem}>
-                    <Image source={require('../../assets/home.png')} style={{ width: 28, height: 28 }} />
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.navItem} onPress={() => router.push('/screens/DocumentScanScreen')}>
-                    <Text style={styles.navIcon}>📄</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.navItem} onPress={() => router.push('/screens/ChatListScreen')}>
-                    <Text style={styles.navIcon}>💬</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity style={styles.navItem}  onPress={() => router.push('/screens/UtilisateursListScreen')}>
-                    <Text style={styles.navIcon}>👤</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.navItem} onPress={() => router.push('/screens/SettingsScreen')}>
-                    <Text style={styles.navIcon}>🔧</Text>
-                </TouchableOpacity>
-            </View>
+            
         </SafeAreaView>
     );
 }

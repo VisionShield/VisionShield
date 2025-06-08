@@ -5,7 +5,10 @@ import { router } from 'expo-router';
 export default function AuthScreen() {
     return (
         <SafeAreaView style={styles.container}>
-            <ScrollView contentContainerStyle={styles.scrollContent}>
+            <ScrollView
+                style={{ flex: 1 }}
+                contentContainerStyle={[styles.scrollContent, { flexGrow: 1 }]}
+            >
                 <Text style={styles.welcome}>Welcome to</Text>
                 <View style={styles.logoRow}>
                     <Image
@@ -35,7 +38,7 @@ export default function AuthScreen() {
                     </View>
                 </View>
 
-                <TouchableOpacity style={styles.appleButton} onPress={() => router.push('/screens/FaceRecognitionScreen')}>
+                <TouchableOpacity style={styles.appleButton} onPress={() => router.push('../(dashboard)/HomeScreen')}>
                     <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
                         <Image
                             source={require('../../assets/apple.png')}
@@ -45,7 +48,7 @@ export default function AuthScreen() {
                         <Text style={styles.appleButtonText}>Sign in with Apple</Text>
                     </View>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.googleButton} onPress={() => router.push('/screens/SignupScreen')}>
+                <TouchableOpacity style={styles.googleButton} onPress={() => router.push('SignupScreen')}>
                     <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
                         <Image
                             source={require('../../assets/google.png')}
@@ -55,10 +58,10 @@ export default function AuthScreen() {
                         <Text style={styles.googleButtonText}>Sign up with Google</Text>
                     </View>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.signupButton} onPress={() => router.push('/screens/SignupScreen')}>
+                <TouchableOpacity style={styles.signupButton} onPress={() => router.push('SignupScreen')}>
                     <Text style={styles.signupButtonText}>Sign up</Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => router.push('/screens/LoginScreen')}>
+                <TouchableOpacity onPress={() => router.push('LoginScreen')}>
                     <Text style={styles.loginText}>Already have an account? Sign in</Text>
                 </TouchableOpacity>
             </ScrollView>

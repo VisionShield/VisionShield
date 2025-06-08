@@ -39,12 +39,13 @@
     "plugins": [
       "expo-apple-authentication",
       "expo-local-authentication",
-      ["react-native-vision-camera", {
-        "cameraPermissionText": "$(PRODUCT_NAME) needs access to your Camera for face recognition and document scanning."
-      }],
-      ["react-native-document-scanner-plugin", {
-        "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera for document scanning."
-      }]
+       ["expo-camera",
+        {
+          "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera",
+          "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone",
+          "recordAudioAndroid": true
+        }
+      ]
     ]
   }
 }
