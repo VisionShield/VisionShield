@@ -9,28 +9,25 @@ import {
   Alert,
   Image,
 } from 'react-native';
-import { Camera } from 'expo-camera';
+import { Camera, CameraView, useCameraPermissions } from 'expo-camera';
 import { router } from 'expo-router';
 
 export default function DocumentScanScreen() {
   const [isScanning, setIsScanning] = useState(false);
-  const [hasPermission, setHasPermission] = useState(null);
+  const [permission, requestPermission] = useCameraPermissions();
   const [photoUri, setPhotoUri] = useState(null);
   const cameraRef = useRef(null);
-  const cameraType = Camera?.Constants?.Type?.back;
+
+  // TODO: Si bug en lançant CameraScreen.js, vérifier que DocumentScanScreen est bien unmount
 
   const handleScan = async () => {
-    if (Platform.OS === 'web') {
-      Alert.alert('Info', 'Scanning only works on mobile');
-      return;
-    }
-    const { status } = await Camera.requestCameraPermissionsAsync();
-    console.log('Camera permission status:', status);
-    setHasPermission(status === 'granted');
-    if (status === 'granted') {
+    const response = await requestPermission();
+    if(response.granted) {
+      console.log("TODO : Permission has been granted")
       setIsScanning(true);
     } else {
-      Alert.alert('Permission denied', 'Camera permission is required.');
+      setIsScanning(false)
+      console.log("TODO: Gestion en cas de non permission")
     }
   };
 
@@ -51,17 +48,15 @@ export default function DocumentScanScreen() {
         <View style={styles.documentFrame}>
           <View style={styles.documentPlaceholder}>
             {isScanning ? (
-              hasPermission === false ? (
+              !permission.granted ? (
                 <Text style={styles.documentIcon}>Permission denied</Text>
-              ) : typeof cameraType !== 'undefined' ? (
-                <Camera
+              ) : (
+                <CameraView
                   ref={cameraRef}
+                  facing="back"
                   style={{ flex: 1, width: '100%', borderRadius: 12 }}
-                  type={cameraType}
                   ratio="4:3"
                 />
-              ) : (
-                <Text style={styles.documentIcon}>Camera not available</Text>
               )
             ) : photoUri ? (
               <Image
