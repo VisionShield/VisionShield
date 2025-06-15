@@ -10,6 +10,7 @@ import {
   Image,
 } from 'react-native';
 import { Camera, CameraView, useCameraPermissions } from 'expo-camera';
+import { Camera, CameraView, useCameraPermissions } from 'expo-camera';
 import { router } from 'expo-router';
 
 export default function DocumentScanScreen() {
@@ -32,8 +33,13 @@ export default function DocumentScanScreen() {
     const response = await requestPermission();
     if(response.granted) {
       console.log("TODO : Permission has been granted")
+    const response = await requestPermission();
+    if(response.granted) {
+      console.log("TODO : Permission has been granted")
       setIsScanning(true);
     } else {
+      setIsScanning(false)
+      console.log("TODO: Gestion en cas de non permission")
       setIsScanning(false)
       console.log("TODO: Gestion en cas de non permission")
     }
