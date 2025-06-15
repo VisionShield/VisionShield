@@ -10,17 +10,16 @@ import {
   Image,
 } from 'react-native';
 import { Camera, CameraView, useCameraPermissions } from 'expo-camera';
-import { Camera, CameraView, useCameraPermissions } from 'expo-camera';
 import { router } from 'expo-router';
 
 export default function DocumentScanScreen() {
-  const [isScanning, setIsScanning] = useState(false); // Par défaut false, le cadre n'est pas affiché
+  const [isScanning, setIsScanning] = useState(false); // Par d├®faut false, le cadre n'est pas affich├®
   const [permission, requestPermission] = useCameraPermissions();
   const [photoUri, setPhotoUri] = useState(null);
   const cameraRef = useRef(null);
   const [cameraType, setCameraType] = useState('back'); // 'back' ou 'front'
 
-  // Demande la permission dès le montage
+  // Demande la permission d├¿s le montage
   React.useEffect(() => {
     (async () => {
       if (!permission?.granted) {
@@ -33,13 +32,8 @@ export default function DocumentScanScreen() {
     const response = await requestPermission();
     if(response.granted) {
       console.log("TODO : Permission has been granted")
-    const response = await requestPermission();
-    if(response.granted) {
-      console.log("TODO : Permission has been granted")
       setIsScanning(true);
     } else {
-      setIsScanning(false)
-      console.log("TODO: Gestion en cas de non permission")
       setIsScanning(false)
       console.log("TODO: Gestion en cas de non permission")
     }
@@ -73,11 +67,11 @@ export default function DocumentScanScreen() {
 
   const handleSavePhoto = () => {
     // TODO: Enregistrer la photo localement (photoUri)
-    Alert.alert('Enregistré', 'La photo a été enregistrée dans le téléphone.');
+    Alert.alert('Enregistr├®', 'La photo a ├®t├® enregistr├®e dans le t├®l├®phone.');
     // Vous pouvez ajouter ici la logique pour sauvegarder dans la galerie si besoin
   };
 
-  // Ajoute la gestion du double tap pour retourner la caméra
+  // Ajoute la gestion du double tap pour retourner la cam├®ra
   const lastTapRef = useRef(0);
   const handleCameraDoubleTap = () => {
     const now = Date.now();
@@ -89,7 +83,7 @@ export default function DocumentScanScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: '#222' }}>
-      {/* Caméra plein écran */}
+      {/* Cam├®ra plein ├®cran */}
       <View style={{ flex: 1 }}>
         {photoUri ? (
           <>
@@ -118,7 +112,7 @@ export default function DocumentScanScreen() {
               }}
               onPress={handleCancelPhoto}
             >
-              <Text style={{ fontSize: 22, color: '#fff', fontWeight: 'bold' }}>✕</Text>
+              <Text style={{ fontSize: 22, color: '#fff', fontWeight: 'bold' }}>Ô£ò</Text>
             </TouchableOpacity>
             {/* Bouton enregistrer */}
             <TouchableOpacity
@@ -174,7 +168,7 @@ export default function DocumentScanScreen() {
               </View>
             )}
 
-            {/* Bouton pour changer de caméra */}
+            {/* Bouton pour changer de cam├®ra */}
             {permission?.granted && (
               <TouchableOpacity
                 style={{
