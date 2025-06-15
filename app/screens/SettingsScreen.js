@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, ScrollView, TouchableOpacity, Switch, Image } from 'react-native';
 import { router } from 'expo-router';
 
@@ -13,9 +13,19 @@ export default function SettingsScreen() {
         { title: 'Profile Picture', onPress: () => router.push('/screens/ProfilePictureScreen') },
     ];
 
+    // Force l'animation d'entrée à gauche avec Expo Router v3+
+    useEffect(() => {
+        router.setOptions?.({
+            animation: 'slide_from_left',
+        });
+    }, []);
+
     return (
         <SafeAreaView style={styles.container}>
             <View style={styles.header}>
+                <TouchableOpacity onPress={() => router.back({ animation: 'slide_from_left' })}>
+                    <Text style={styles.backButton}>←</Text>
+                </TouchableOpacity>
                 <Text style={styles.headerTitle}>Settings</Text>
             </View>
 

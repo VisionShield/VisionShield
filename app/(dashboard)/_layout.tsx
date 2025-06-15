@@ -6,15 +6,15 @@ const DashboardLayout = () => {
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: "#3479e3", // bleu doux pour l'icône active
-        tabBarInactiveTintColor: "#444", // gris foncé pour l'icône inactive
+        tabBarActiveTintColor: "#3479e3",
+        tabBarInactiveTintColor: "#444",
         tabBarStyle: {
           position: "absolute",
           bottom: 0,
           left: 0,
           right: 0,
           height: 70,
-          backgroundColor: "#f7f7fa", // gris très clair
+          backgroundColor: "#f7f7fa",
           borderTopWidth: 0,
           shadowColor: "#000",
           shadowOffset: { width: 0, height: -2 },
@@ -56,6 +56,21 @@ const DashboardLayout = () => {
         }}
       />
       <Tabs.Screen
+        name="Search"
+        options={{
+          tabBarIcon: ({ focused }) => (
+            <Image
+              source={require("../../assets/search.png")}
+              style={{
+                width: 28,
+                height: 28,
+                tintColor: focused ? "#3479e3" : "#444",
+              }}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="ChatListScreen"
         options={{
           tabBarIcon: ({ focused }) => (
@@ -70,21 +85,11 @@ const DashboardLayout = () => {
           ),
         }}
       />
-      <Tabs.Screen
-        name="SettingsScreen"
-        options={{
-          tabBarIcon: ({ focused }) => (
-            <Image
-              source={require("../../assets/settings.png")}
-              style={{
-                width: 28,
-                height: 28,
-                tintColor: focused ? "#3479e3" : "#444",
-              }}
-            />
-          ),
-        }}
-      />
+      {/* ⚠️ Assure-toi qu'il n'y a PAS de fichier index.js, index.tsx, UserProfile.js, UserProfile.tsx, ou [id].js directement dans app/(dashboard)/ */}
+      {/* ⚠️ Vérifie que tu n'as pas de _layout.tsx dans app/(dashboard)/(user_profile)/ */}
+      {/* ⚠️ Le fichier du profil doit être UNIQUEMENT dans app/(dashboard)/(user_profile)/[id].js */}
+      {/* ⚠️ Si tu as un fichier app/(dashboard)/(user_profile)/index.js ou app/(dashboard)/(user_profile)/UserProfile.js, SUPPRIME-LE */}
+      {/* ⚠️ Après avoir fait ces vérifications, fais un "npx expo start -c" pour vider le cache Expo Router */}
     </Tabs>
   );
 };

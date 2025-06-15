@@ -1,17 +1,53 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView, Alert } from 'react-native';
 import { router } from 'expo-router';
+import * as SecureStore from 'expo-secure-store';
+import { API_IP } from '../constants/config';
+// Fonction utilitaire pour fetch avec Authorization
+
 
 export default function LoginScreen() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [loading, setLoading] = useState(false);
 
-    const handleLogin = () => {
-        if (email === 'test@example.com' && password === 'password123') {
-            Alert.alert('Success', 'You are logged in!');
-            router.replace('/(dashboard)/HomeScreen'); // Redirect to HomeScreen after login
-        } else {
-            Alert.alert('Error', 'Invalid credentials. Use test@example.com / password123');
+    const handleLogin = async () => {
+        setLoading(true);
+        try {
+            const response = await fetch(`http://${API_IP}/login`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include', // pour accepter le cookie httpOnly
+                body: JSON.stringify({ email, password }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Invalid credentials');
+            }
+
+            const data = await response.json();
+            // data.access_token attendu, refresh token dans cookie httpOnly
+            if (data.user_id) {
+                await SecureStore.setItemAsync('user_id', data.user_id.toString());
+            }
+            if (data.access_token) {
+                // Stocke le token de façon sécurisée
+                await SecureStore.setItemAsync('access_token', data.access_token);
+                // Stocke aussi le userId si présent
+
+                Alert.alert('Success', 'You are logged in!');
+                router.replace('/(dashboard)/HomeScreen');
+                //router.replace('/(chat)/ChatScreen'); // Redirige vers l'écran de chat
+            } else {
+                throw new Error('No access token received');
+            }
+        } catch (err) {
+            console.error('Login error:', err);
+            Alert.alert('Error', 'Invalid credentials or server error');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -45,8 +81,8 @@ export default function LoginScreen() {
                         onChangeText={setPassword}
                     />
 
-                    <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-                        <Text style={styles.loginButtonText}>Sign In</Text>
+                    <TouchableOpacity style={styles.loginButton} onPress={handleLogin} disabled={loading}>
+                        <Text style={styles.loginButtonText}>{loading ? 'Signing In...' : 'Sign In'}</Text>
                     </TouchableOpacity>
 
                     <TouchableOpacity>

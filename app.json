@@ -39,13 +39,15 @@
     "plugins": [
       "expo-apple-authentication",
       "expo-local-authentication",
-       ["expo-camera",
+      [
+        "expo-camera",
         {
           "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera",
           "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone",
           "recordAudioAndroid": true
         }
-      ]
+      ],
+      "expo-secure-store"
     ]
   }
 }

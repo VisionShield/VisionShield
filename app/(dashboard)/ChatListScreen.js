@@ -1,32 +1,53 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, SafeAreaView, TextInput, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-
-const chats = [
-    {
-        id: '1',
-        name: 'Olivia Turner',
-        lastMessage: 'Hey, did you review the contract?',
-        time: '10:30 AM',
-        unread: 2,
-        avatar: require('../../assets/iconef.png'),
-    },
-    {
-        id: '2',
-        name: 'Legal Team',
-        lastMessage: 'Important security update',
-        time: '9:45 AM',
-        unread: 0,
-        avatar: require('../../assets/iconeh.png'),
-    },
-];
+import * as SecureStore from 'expo-secure-store';
+import { API_IP } from '../constants/config';
+import { useFocusEffect } from '@react-navigation/native';
+import { fetchWithAuth } from '../utils/fetchWithAuth';
 
 export default function ChatListScreen() {
     const [search, setSearch] = useState('');
-    const filteredChats = chats.filter(chat =>
-        chat.name.toLowerCase().includes(search.toLowerCase()) ||
-        chat.lastMessage.toLowerCase().includes(search.toLowerCase())
+    const [conversations, setConversations] = useState([]);
+
+    // Remplace useEffect par useFocusEffect pour recharger à chaque focus
+    useFocusEffect(
+        React.useCallback(() => {
+            let isActive = true;
+            async function fetchConversations() {
+                try {
+                    const res = await fetchWithAuth(`http://${API_IP}/conversations`);
+                    if (!res.ok) {
+                        const text = await res.text();
+                        console.error('HTTP error:', res.status, text);
+                        if (isActive) setConversations([]);
+                        return;
+                    }
+                    const data = await res.json();
+                    const mapped = Array.isArray(data)
+                        ? data.map(conv => ({
+                            ...conv,
+                            last_message: conv.last_message || '',
+                        }))
+                        : [];
+                    mapped.forEach(conv => {
+                        console.log(`Conversation ${conv.conv_id || conv.id}: last_message = "${conv.last_message}"`);
+                    });
+                    if (isActive) setConversations(mapped);
+                } catch (e) {
+                    if (isActive) setConversations([]);
+                    console.error('Error fetching conversations:', e);
+                }
+            }
+            fetchConversations();
+            return () => { isActive = false; };
+        }, [])
+    );
+
+    const filteredChats = (conversations || []).filter(chat =>
+        chat.other_participant_name?.toLowerCase().includes(search.toLowerCase()) ||
+        (chat.last_message && chat.last_message.toLowerCase().includes(search.toLowerCase()))
     );
 
     const renderChat = ({ item }) => (
@@ -35,29 +56,28 @@ export default function ChatListScreen() {
             onPress={() =>
                 router.push({
                     pathname: '/(chat)/ChatScreen',
-                    params: { target: '/screens/ChatScreen', userId: item.id },
+                    params: { conv_id: item.conv_id, other_participant_id: item.other_participant_id , other_participant_name: item.other_participant_name },
                 })
             }
         >
             <View style={styles.avatar}>
-                <Image source={item.avatar} style={{ width: 32, height: 32 }} />
+                <Image
+                    source={
+                        item.pp_url
+                            ? { uri: item.pp_url }
+                            : require('../../assets/profile.png')
+                    }
+                    style={{ width: 32, height: 32, borderRadius: 16 }}
+                />
             </View>
             <View style={styles.chatInfo}>
-                <Text style={styles.chatName}>{item.name}</Text>
+                <Text style={styles.chatName}>{item.other_participant_name}</Text>
                 <Text
-                    style={[styles.lastMessage, item.unread > 0 && styles.unreadMessage]}
+                    style={styles.lastMessage}
                     numberOfLines={1}
                 >
-                    {item.lastMessage}
+                    {item.last_message_is_your ? `Vous : ${item.last_message}` : item.last_message}
                 </Text>
-            </View>
-            <View style={styles.chatMeta}>
-                <Text style={styles.time}>{item.time}</Text>
-                {item.unread > 0 && (
-                    <View style={styles.unreadBadge}>
-                        <Text style={styles.unreadText}>{item.unread}</Text>
-                    </View>
-                )}
             </View>
         </TouchableOpacity>
     );
@@ -85,11 +105,10 @@ export default function ChatListScreen() {
 
             <FlatList
                 data={filteredChats}
-                keyExtractor={item => item.id}
+                keyExtractor={item => item.id?.toString() || item.other_participant_name}
                 renderItem={renderChat}
                 contentContainerStyle={styles.listContent}
             />
-            
         </SafeAreaView>
     );
 }

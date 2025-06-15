@@ -1,7 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, SafeAreaView, TextInput, Alert, Image } from 'react-native';
 import { router } from 'expo-router';
 import Utilisateurs from '../constants/Utilisateurs';
+import * as SecureStore from 'expo-secure-store';
+import { API_IP } from '../constants/config';
+import { fetchWithAuth } from '../utils/fetchWithAuth';
 
 export default function HomeScreen() {
     const [users, setUsers] = useState([
@@ -74,42 +77,67 @@ export default function HomeScreen() {
         router.push({ pathname: '/(chat)/ChatScreen', params: { userId: user.id } });
     };
 
+    // Ajout pour le profil utilisateur connecté
+    const [profile, setProfile] = useState(null);
+
+    useEffect(() => {
+        async function fetchProfile() {
+            try {
+                const token = await SecureStore.getItemAsync('access_token');
+                const res = await fetchWithAuth(`http://${API_IP}/users/me`, {
+                    headers: token ? { Authorization: `Bearer ${token}` } : {},
+                });
+                if (!res.ok) return;
+                const data = await res.json();
+                setProfile(data);
+            } catch {
+                setProfile(null);
+            }
+        }
+        fetchProfile();
+    }, []);
+
     return (
         <SafeAreaView style={styles.container}>
             <View style={styles.header}>
-                <TouchableOpacity onPress={() => router.push('/screens/SettingsScreen')}>
-                    <Text style={styles.menuIcon}>☰</Text>
-                </TouchableOpacity>
+                <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
+                    <TouchableOpacity
+                        onPress={() => router.push('/screens/FriendRequest')}
+                        style={{ marginRight: 10 }}
+                    >
+                        <Image source={require('../../assets/friend_request.png')} style={{ width: 28, height: 28 }} />
+                    </TouchableOpacity>
+                </View>
                 <Text style={styles.homeTitle}>Home</Text>
-                <TouchableOpacity
-                    onPress={() =>
-                        Alert.alert(
-                            'Choose a list',
-                            'Where do you want to go?',
-                            [
-                                {
-                                    text: 'Users',
-                                    onPress: () => router.push('/screens/UtilisateursListScreen'),
-                                },
-                                {
-                                    text: 'Shared documents',
-                                    onPress: () => router.push('/screens/DocShareScreen'),
-                                },
-                                { text: 'Cancel', style: 'cancel' },
-                            ]
-                        )
-                    }
-                >
-                    <Text style={styles.moreIcon}>⋯</Text>
-                </TouchableOpacity>
+                <View style={{ flex: 1, alignItems: 'flex-end' }}>
+                    <TouchableOpacity
+                        onPress={() => router.push('/screens/SettingsScreen')}
+                    >
+                        <Image source={require('../../assets/settings.png')} style={{ width: 28, height: 28 }} />
+                    </TouchableOpacity>
+                </View>
             </View>
 
             <View style={styles.profileSection}>
                 <View style={styles.profileCard}>
-                    <Image source={require('../../assets/iconeh.png')} style={{ width: 40, height: 40, marginRight: 15 }} />
+                    {profile && profile.pp_url ? (
+                        <View style={styles.profilePicWrapper}>
+                            <Image
+                                source={{ uri: profile.pp_url }}
+                                style={styles.profilePic}
+                            />
+                        </View>
+                    ) : (
+                        <View style={styles.profilePicWrapper}>
+                            <Image
+                                source={require('../../assets/profile.png')}
+                                style={styles.profilePic}
+                            />
+                        </View>
+                    )}
                     <View style={styles.profileInfo}>
-                        <Text style={styles.profileName}>Neelesh Chaudhary</Text>
-                        <Text style={styles.profileRole}>Designer</Text>
+                        <Text style={styles.profileName}>{profile?.full_name || '...'}</Text>
+                        <Text style={styles.profileRole}>{profile?.username || ''}</Text>
                     </View>
                 </View>
             </View>
@@ -118,7 +146,7 @@ export default function HomeScreen() {
                 <View style={styles.searchContainer}>
                     <TextInput
                         style={styles.searchInput}
-                        placeholder="🔍 Search users"
+                        placeholder="🔍 Search documents"
                         placeholderTextColor="#999"
                         value={search}
                         onChangeText={handleSearch}
@@ -126,76 +154,10 @@ export default function HomeScreen() {
                     />
                 </View>
 
+                {/* Affiche uniquement la section des fichiers */}
                 <View style={styles.section}>
                     <View style={styles.sectionHeader}>
-                        <Text style={styles.sectionTitle}>My users:</Text>
-                        <View style={styles.sectionActions}>
-                            <TouchableOpacity
-                                style={styles.actionButton}
-                                onPress={() => setShowAddUser(true)}
-                            >
-                                <Text style={styles.actionIcon}>+</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity style={styles.actionButton} onPress={() => router.push('/screens/UtilisateursListScreen')}>
-                                <Text style={styles.actionIcon}>☰</Text>
-                            </TouchableOpacity>
-                        </View>
-                    </View>
-
-                    {/* Add user form */}
-                    {showAddUser && (
-                        <View style={{ backgroundColor: '#f0f4fa', padding: 16, borderRadius: 8, marginBottom: 16 }}>
-                            <TextInput
-                                style={[styles.searchInput, { marginBottom: 8 }]}
-                                placeholder="User name"
-                                value={newUserName}
-                                onChangeText={setNewUserName}
-                            />
-                            <TextInput
-                                style={styles.searchInput}
-                                placeholder="Role"
-                                value={newUserRole}
-                                onChangeText={setNewUserRole}
-                            />
-                            <View style={{ flexDirection: 'row', marginTop: 8 }}>
-                                <TouchableOpacity
-                                    style={[styles.actionButton, { marginRight: 16 }]}
-                                    onPress={handleAddUser}
-                                >
-                                    <Text style={styles.actionIcon}>Add</Text>
-                                </TouchableOpacity>
-                                <TouchableOpacity
-                                    style={styles.actionButton}
-                                    onPress={() => setShowAddUser(false)}
-                                >
-                                    <Text style={styles.actionIcon}>Cancel</Text>
-                                </TouchableOpacity>
-                            </View>
-                        </View>
-                    )}
-
-                    {filteredUsers.map((user) => (
-                        <TouchableOpacity
-                            key={user.id}
-                            style={styles.userCard}
-                            onPress={() => handleUserPress(user)}
-                        >
-                            <Image source={user.avatar} style={{ width: 40, height: 40, marginRight: 15 }} />
-                            <View style={styles.userInfo}>
-                                <Text style={styles.userName}>{user.name}</Text>
-                                <Text style={styles.userRole}>{user.role}</Text>
-                                <Text style={styles.userStatus}>{user.status}</Text>
-                            </View>
-                            <View style={styles.userBadge}>
-                                <Text style={styles.userType}>{user.type}</Text>
-                            </View>
-                            {/* Removed heart icon */}
-                        </TouchableOpacity>
-                    ))}
-                </View>
-                <View style={styles.section}>
-                    <View style={styles.sectionHeader}>
-                        <Text style={styles.sectionTitle}>Recently shared files:</Text>
+                        <Text style={styles.sectionTitle}>My documents:</Text>
                         <View style={styles.sectionActions}>
                             <TouchableOpacity
                                 style={styles.actionButton}
@@ -230,8 +192,6 @@ export default function HomeScreen() {
                     ))}
                 </View>
             </ScrollView>
-
-            
         </SafeAreaView>
     );
 }
@@ -274,9 +234,21 @@ const styles = StyleSheet.create({
         padding: 20,
         borderRadius: 12,
     },
-    profileAvatar: {
-        fontSize: 40,
+    profilePicWrapper: {
+        width: 56,
+        height: 56,
+        borderRadius: 28,
+        overflow: 'hidden',
+        backgroundColor: '#e0e0e0',
         marginRight: 15,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    profilePic: {
+        width: 44,
+        height: 44,
+        borderRadius: 22,
+        resizeMode: 'cover',
     },
     profileInfo: {
         flex: 1,

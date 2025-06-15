@@ -9,28 +9,33 @@ import {
   Alert,
   Image,
 } from 'react-native';
-import { Camera } from 'expo-camera';
+import { Camera, CameraView, useCameraPermissions } from 'expo-camera';
 import { router } from 'expo-router';
 
 export default function DocumentScanScreen() {
-  const [isScanning, setIsScanning] = useState(false);
-  const [hasPermission, setHasPermission] = useState(null);
+  const [isScanning, setIsScanning] = useState(false); // Par défaut false, le cadre n'est pas affiché
+  const [permission, requestPermission] = useCameraPermissions();
   const [photoUri, setPhotoUri] = useState(null);
   const cameraRef = useRef(null);
-  const cameraType = Camera?.Constants?.Type?.back;
+  const [cameraType, setCameraType] = useState('back'); // 'back' ou 'front'
+
+  // Demande la permission dès le montage
+  React.useEffect(() => {
+    (async () => {
+      if (!permission?.granted) {
+        await requestPermission();
+      }
+    })();
+  }, [permission, requestPermission]);
 
   const handleScan = async () => {
-    if (Platform.OS === 'web') {
-      Alert.alert('Info', 'Scanning only works on mobile');
-      return;
-    }
-    const { status } = await Camera.requestCameraPermissionsAsync();
-    console.log('Camera permission status:', status);
-    setHasPermission(status === 'granted');
-    if (status === 'granted') {
+    const response = await requestPermission();
+    if(response.granted) {
+      console.log("TODO : Permission has been granted")
       setIsScanning(true);
     } else {
-      Alert.alert('Permission denied', 'Camera permission is required.');
+      setIsScanning(false)
+      console.log("TODO: Gestion en cas de non permission")
     }
   };
 
@@ -39,62 +44,211 @@ export default function DocumentScanScreen() {
       const photo = await cameraRef.current.takePictureAsync();
       setPhotoUri(photo.uri);
       setIsScanning(false);
-      Alert.alert('Success', 'Document scanned successfully!');
+      // Alert removed: Document scanned successfully!
     }
   };
 
-  return (
-    <SafeAreaView style={styles.container}>
-      <Text style={styles.instruction}>Place the document in the frame</Text>
+  const handleSwitchCamera = () => {
+    setCameraType((prev) => (prev === 'back' ? 'front' : 'back'));
+  };
 
-      <View style={styles.cameraContainer}>
-        <View style={styles.documentFrame}>
-          <View style={styles.documentPlaceholder}>
-            {isScanning ? (
-              hasPermission === false ? (
-                <Text style={styles.documentIcon}>Permission denied</Text>
-              ) : typeof cameraType !== 'undefined' ? (
-                <Camera
+  const handleCancelPhoto = () => {
+    setPhotoUri(null);
+    setIsScanning(false);
+  };
+
+  const handleSendPhoto = () => {
+    // Navigue vers la page ShareDocument en passant l'uri de la photo
+    router.push({
+      pathname: '/screens/ShareDocument',
+      params: { photoUri }
+    });
+  };
+
+  const handleSavePhoto = () => {
+    // TODO: Enregistrer la photo localement (photoUri)
+    Alert.alert('Enregistré', 'La photo a été enregistrée dans le téléphone.');
+    // Vous pouvez ajouter ici la logique pour sauvegarder dans la galerie si besoin
+  };
+
+  // Ajoute la gestion du double tap pour retourner la caméra
+  const lastTapRef = useRef(0);
+  const handleCameraDoubleTap = () => {
+    const now = Date.now();
+    if (lastTapRef.current && now - lastTapRef.current < 300) {
+      handleSwitchCamera();
+    }
+    lastTapRef.current = now;
+  };
+
+  return (
+    <View style={{ flex: 1, backgroundColor: '#222' }}>
+      {/* Caméra plein écran */}
+      <View style={{ flex: 1 }}>
+        {photoUri ? (
+          <>
+            <Image
+              source={{ uri: photoUri }}
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '100%',
+                height: '100%',
+                zIndex: 1,
+              }}
+              resizeMode="cover"
+            />
+            {/* Croix pour annuler */}
+            <TouchableOpacity
+              style={{
+                position: 'absolute',
+                top: 40,
+                left: 20,
+                backgroundColor: 'rgba(0,0,0,0.5)',
+                borderRadius: 20,
+                padding: 8,
+                zIndex: 20,
+              }}
+              onPress={handleCancelPhoto}
+            >
+              <Text style={{ fontSize: 22, color: '#fff', fontWeight: 'bold' }}>✕</Text>
+            </TouchableOpacity>
+            {/* Bouton enregistrer */}
+            <TouchableOpacity
+              style={{
+                position: 'absolute',
+                bottom: 110, // remonte le bouton
+                left: 30,
+                backgroundColor: '#4CAF50',
+                borderRadius: 24,
+                paddingVertical: 14,
+                paddingHorizontal: 28,
+                zIndex: 20,
+              }}
+              onPress={handleSavePhoto}
+            >
+              <Text style={{ color: '#fff', fontWeight: 'bold', fontSize: 17 }}>Enregistrer</Text>
+            </TouchableOpacity>
+            {/* Bouton envoyer */}
+            <TouchableOpacity
+              style={{
+                position: 'absolute',
+                bottom: 110, // remonte le bouton
+                right: 30,
+                backgroundColor: '#2196F3',
+                borderRadius: 24,
+                paddingVertical: 14,
+                paddingHorizontal: 28,
+                zIndex: 20,
+              }}
+              onPress={handleSendPhoto}
+            >
+              <Text style={{ color: '#fff', fontWeight: 'bold', fontSize: 17 }}>Envoyer</Text>
+            </TouchableOpacity>
+          </>
+        ) : (
+          <>
+            {permission?.granted ? (
+              <TouchableOpacity
+                activeOpacity={1}
+                style={{ flex: 1, width: '100%' }}
+                onPress={handleCameraDoubleTap}
+              >
+                <CameraView
                   ref={cameraRef}
-                  style={{ flex: 1, width: '100%', borderRadius: 12 }}
-                  type={cameraType}
+                  facing={cameraType}
+                  style={{ flex: 1, width: '100%' }}
                   ratio="4:3"
                 />
-              ) : (
-                <Text style={styles.documentIcon}>Camera not available</Text>
-              )
-            ) : photoUri ? (
-              <Image
-                source={{ uri: photoUri }}
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  borderRadius: 12,
-                }}
-              />
+              </TouchableOpacity>
             ) : (
-              <Text style={styles.documentIcon}>📄</Text>
+              <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                <Text style={styles.documentIcon}>Permission denied</Text>
+              </View>
             )}
-          </View>
-          <View style={styles.corners}>
-            <View style={[styles.corner, styles.topLeft]} />
-            <View style={[styles.corner, styles.topRight]} />
-            <View style={[styles.corner, styles.bottomLeft]} />
-            <View style={[styles.corner, styles.bottomRight]} />
-          </View>
-        </View>
-      </View>
 
-      {isScanning ? (
-        <TouchableOpacity style={styles.captureButton} onPress={takePicture}>
-          <View style={styles.captureButtonInner} />
-        </TouchableOpacity>
-      ) : (
-        <TouchableOpacity style={styles.captureButton} onPress={handleScan}>
-          <View style={styles.captureButtonInner} />
-        </TouchableOpacity>
-      )}
-    </SafeAreaView>
+            {/* Bouton pour changer de caméra */}
+            {permission?.granted && (
+              <TouchableOpacity
+                style={{
+                  position: 'absolute',
+                  top: 40,
+                  right: 20,
+                  backgroundColor: 'transparent',
+                  borderRadius: 20,
+                  padding: 0,
+                  zIndex: 10,
+                  elevation: 2,
+                }}
+                onPress={handleSwitchCamera}
+              >
+                <Image
+                  source={require('../../assets/camchange.png')}
+                  style={{
+                    width: 40,
+                    height: 40,
+                    tintColor: '#2196F3',
+                  }}
+                />
+              </TouchableOpacity>
+            )}
+
+            {/* Bouton pour afficher/masquer le cadre */}
+            {permission?.granted && (
+              <TouchableOpacity
+                style={{
+                  position: 'absolute',
+                  top: 40,
+                  left: 20,
+                  backgroundColor: 'transparent',
+                  borderRadius: 20,
+                  padding: 0,
+                  zIndex: 10,
+                  elevation: 2,
+                }}
+                onPress={() => setIsScanning((prev) => !prev)}
+              >
+                <Image
+                  source={require('../../assets/cadre.png')}
+                  style={{
+                    width: 40,
+                    height: 40,
+                    tintColor: isScanning ? '#2196F3' : '#fff',
+                  }}
+                />
+              </TouchableOpacity>
+            )}
+
+            {/* Cadre de scan du document */}
+            {isScanning && (
+              <View style={styles.overlayContainer} pointerEvents="none">
+                <View style={styles.cameraOverlay}>
+                  <View style={styles.documentFrame}>
+                    <View style={styles.corners}>
+                      <View style={[styles.corner, styles.topLeft]} />
+                      <View style={[styles.corner, styles.topRight]} />
+                      <View style={[styles.corner, styles.bottomLeft]} />
+                      <View style={[styles.corner, styles.bottomRight]} />
+                    </View>
+                  </View>
+                </View>
+              </View>
+            )}
+
+            {/* Bouton de capture */}
+            {permission?.granted && (
+              <TouchableOpacity
+                style={[styles.captureButton, { bottom: 110 }]} // remonte le bouton
+                onPress={takePicture}
+              >
+                <View style={styles.captureButtonInner} />
+              </TouchableOpacity>
+            )}
+          </>
+        )}
+      </View>
+    </View>
   );
 }
 
@@ -111,10 +265,29 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  overlayContainer: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 5,
+  },
+  cameraOverlay: {
+    width: '100%',
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   documentFrame: {
     width: 280,
     height: 400,
     position: 'relative',
+    backgroundColor: 'rgba(255,255,255,0.03)',
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: '#fff',
+    borderStyle: 'dashed',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   documentPlaceholder: {
     flex: 1,
@@ -163,9 +336,9 @@ const styles = StyleSheet.create({
     borderLeftWidth: 0,
   },
   captureButton: {
+    position: 'absolute',
+    bottom: 60,
     alignSelf: 'center',
-    marginVertical: 30,
-    marginBottom: 90, // Ajouté pour éloigner le bouton de la navbar
     width: 80,
     height: 80,
     backgroundColor: '#fff',
@@ -174,6 +347,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderWidth: 4,
     borderColor: '#ccc',
+    zIndex: 10,
   },
   captureButtonInner: {
     width: 60,
