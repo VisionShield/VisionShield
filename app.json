@@ -10,56 +10,60 @@
           "recordAudioAndroid": true
         }
       ]
-    ]
-  },
-    "slug": "vision-shield",
-    "version": "1.0.0",
-    "orientation": "portrait",
-    "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
-    "splash": {
-      "image": "./assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
-    "assetBundlePatterns": [
-      "**/*"
     ],
     "ios": {
-      "supportsTablet": true,
-      "usesAppleSignIn": true,
-      "infoPlist": {
-        "NSCameraUsageDescription": "Vision Shield utilise la caméra pour la reconnaissance faciale sécurisée et la numérisation de documents.",
-        "NSFaceIDUsageDescription": "Vision Shield utilise Face ID pour l'authentification sécurisée.",
-        "NSMicrophoneUsageDescription": "Vision Shield peut utiliser le microphone pour l'enregistrement audio sécurisé."
-      }
+      "bundleIdentifier": "com.anonymous.vision-shield"
+    }
+  },
+  "slug": "vision-shield",
+  "version": "1.0.0",
+  "orientation": "portrait",
+  "icon": "./assets/icon.png",
+  "userInterfaceStyle": "light",
+  "experiments.reactCanary": true,
+  "splash": {
+    "image": "./assets/splash.png",
+    "resizeMode": "contain",
+    "backgroundColor": "#ffffff"
+  },
+  "assetBundlePatterns": [
+    "**/*"
+  ],
+  "ios": {
+    "supportsTablet": true,
+    "usesAppleSignIn": true,
+    "infoPlist": {
+      "NSCameraUsageDescription": "Vision Shield utilise la caméra pour la reconnaissance faciale sécurisée et la numérisation de documents.",
+      "NSFaceIDUsageDescription": "Vision Shield utilise Face ID pour l'authentification sécurisée.",
+      "NSMicrophoneUsageDescription": "Vision Shield peut utiliser le microphone pour l'enregistrement audio sécurisé."
+    }
+  },
+  "android": {
+    "adaptiveIcon": {
+      "foregroundImage": "./assets/adaptive-icon.png",
+      "backgroundColor": "#ffffff"
     },
-    "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      },
-      "permissions": [
-        "CAMERA",
-        "RECORD_AUDIO",
-        "USE_FINGERPRINT",
-        "USE_BIOMETRIC"
-      ]
-    },
-    "web": {
-      "favicon": "./assets/favicon.png"
-    },
-    "plugins": [
-      "expo-apple-authentication",
-      "expo-local-authentication",
-      [
-        "expo-camera",
-        {
-          "cameraPermission": "Vision Shield utilise la caméra pour la reconnaissance faciale sécurisée.",
-          "microphonePermission": "Vision Shield peut utiliser le microphone pour l'enregistrement audio sécurisé.",
-          "recordAudioAndroid": true
-        }
-      ],
-      "expo-secure-store"
+    "permissions": [
+      "CAMERA",
+      "RECORD_AUDIO",
+      "USE_FINGERPRINT",
+      "USE_BIOMETRIC"
     ]
-  }
+  },
+  "web": {
+    "favicon": "./assets/favicon.png"
+  },
+  "plugins": [
+    "expo-apple-authentication",
+    "expo-local-authentication",
+    [
+      "expo-camera",
+      {
+        "cameraPermission": "Vision Shield utilise la caméra pour la reconnaissance faciale sécurisée.",
+        "microphonePermission": "Vision Shield peut utiliser le microphone pour l'enregistrement audio sécurisé.",
+        "recordAudioAndroid": true
+      }
+    ],
+    "expo-secure-store"
+  ]
+}
