@@ -1,50 +1,72 @@
-# Welcome to your Expo app 👋
+# 🛡️ VisionShield
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+**A secure communication mobile app:** video-based registration, real-time chat, video calls over WebRTC, friends and document sharing, with AI that detects forbidden objects in video.
 
-## Get started
+![React Native](https://img.shields.io/badge/React%20Native-20232A?style=flat&logo=react&logoColor=61DAFB)
+![Expo](https://img.shields.io/badge/Expo-000020?style=flat&logo=expo&logoColor=white)
+![Go](https://img.shields.io/badge/Go-00ADD8?style=flat&logo=go&logoColor=white)
+![MongoDB](https://img.shields.io/badge/MongoDB-47A248?style=flat&logo=mongodb&logoColor=white)
+![WebRTC](https://img.shields.io/badge/WebRTC-333333?style=flat&logo=webrtc&logoColor=white)
+![Python](https://img.shields.io/badge/Python-3776AB?style=flat&logo=python&logoColor=white)
 
-1. Install dependencies
+---
 
-   ```bash
-   npm install
-   ```
+## Features
 
-2. Start the app
+- 🔐 **Accounts and authentication:** sign-up (including sign-up with a video), login, and JWT access tokens refreshed with a refresh token
+- 💬 **Real-time chat:** conversations over WebSocket, with documents attached to messages
+- 📹 **Video streaming:** live video over WebRTC
+- 👥 **Social:** user profiles, friend requests, friend list and real-time contact search
+- 📁 **Documents:** upload, list, share and delete files (stored on Cloudinary)
+- 🤖 **AI detection:** a YOLO-based model that spots forbidden objects in video
 
-   ```bash
-   npx expo start
-   ```
+## Architecture
 
-In the output, you'll find options to open the app in a
+The project is split into three repositories:
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+| Repository | Role | Stack |
+|---|---|---|
+| [`VisionShield`](https://github.com/VisionShield/VisionShield) (this one) | Mobile app | React Native, Expo, Expo Router |
+| [`backend`](https://github.com/VisionShield/backend) | REST API, WebSocket chat, WebRTC signaling | Go, MongoDB, Cloudinary |
+| [`IA_objets`](https://github.com/VisionShield/IA_objets) | Forbidden-object detection | Python, YOLO |
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
+```
+Mobile app (Expo)  ──REST / WebSocket──▶  Go backend  ──▶  MongoDB + Cloudinary
+                                              │
+                                              └──▶  AI detection (Python / YOLO)
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+## App structure
 
-## Learn more
+```
+app/
+├── (auth)/          # Login and sign-up screens
+├── (chat)/          # Conversations and messages
+├── (dashboard)/     # Main screens after login
+├── (user_profile)/  # User profile
+├── components/      # Reusable UI components
+├── constants/       # Colors, configuration
+├── screens/         # Other screens
+└── utils/           # Helpers (API calls, etc.)
+```
 
-To learn more about developing your project with Expo, look at the following resources:
+Navigation uses Expo Router's file-based routing: each file in `app/` is a screen.
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+## Getting started
 
-## Join the community
+**Requirements:** Node.js and npm, plus the Expo Go app on your phone (or an Android/iOS emulator).
 
-Join our community of developers creating universal apps.
+```bash
+git clone https://github.com/VisionShield/VisionShield.git
+cd VisionShield
+npm install
+npx expo start
+```
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+Scan the QR code with Expo Go, or press `a` for an Android emulator and `i` for an iOS simulator.
+
+The app needs the [backend](https://github.com/VisionShield/backend) running. See that repository for its setup and the full list of API routes.
+
+## Team
+
+Amira Bammoun · Zakaria Guitaoui · Daniel Murugarajah · Maxime Natarianni · Lina Ouchaou · Justine Pogeant
